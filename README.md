@@ -79,12 +79,26 @@ My current work centers on **composition–mechanism–performance modeling** ac
 
 ## Selected Research
 
-| Year | Study | Journal |
-| :---: | --- | --- |
-| 2025 | [Biomimetic self-reinforcing recyclable biomass-derived inherently-safe sustainable materials](https://doi.org/10.1038/s41467-025-64664-9) | *Nature Communications* **16**, 9683 |
-| 2024 | [Scientific discovery framework accelerating advanced polymeric materials design](https://doi.org/10.34133/research.0406) | *Research* **7**, 0406 |
-| 2023 | [Bioinspired machine-learning-assisted early-fire perception system based on a VO₂ optical switch](https://doi.org/10.1002/adfm.202210251) | *Advanced Functional Materials* **33**, 2210251 |
-| 2019 | [Bioinspired color-changing molecular sensor toward early fire detection](https://doi.org/10.1002/adfm.201806586) | *Advanced Functional Materials* **29**, 1806586 |
+### AI-Enabled Polymer & Fire-Safety Research
+
+- **[Progress in Polymer Science · 2026](https://doi.org/10.1016/j.progpolymsci.2026.102153)** — Reaction-to-fire characterization data driving the AI-assisted design of flame-retardant polymeric materials. *Prog. Polym. Sci.* **180**, 102153.
+- **[Accounts of Materials Research · 2025](https://doi.org/10.1021/accountsmr.5c00065)** — Design and development of fire-safety materials in artificial intelligence era. *Acc. Mater. Res.* **6**, 544–549.
+- **[Research · 2024](https://doi.org/10.34133/research.0406)** — Scientific discovery framework accelerating advanced polymeric materials design. *Research* **7**, 0406.
+- **[Polymer Degradation and Stability · 2024](https://doi.org/10.1016/j.polymdegradstab.2024.110981)** — Deeper insights into flame retardancy of polymers by interpretable, quantifiable, yet accurate machine-learning model. *Polym. Degrad. Stab.* **230**, 110981.
+
+### Fire-Safe & Sustainable Polymeric Materials
+
+- **[Nature Communications · 2025](https://doi.org/10.1038/s41467-025-64664-9)** — Biomimetic self-reinforcing recyclable biomass-derived inherently-safe sustainable materials. *Nat. Commun.* **16**, 9683.
+- **[Materials Horizons · 2025](https://doi.org/10.1039/D5MH00878F)** — Thermally activated and fire-resistant thiol-Michael dynamic crosslinking networks for wildfire prevention. *Mater. Horiz.* **12**, 7463–7472.
+
+### Combustion Analysis & Early-Fire Perception
+
+- **[Journal of Hazardous Materials · 2024](https://doi.org/10.1016/j.jhazmat.2024.133914)** — Hazard evaluation of forest combustibles based on the correlation between pyrolysis products and combustion parameters. *J. Hazard. Mater.* **469**, 133914.
+- **[Advanced Functional Materials · 2023](https://doi.org/10.1002/adfm.202210251)** — Bioinspired machine-learning-assisted early-fire perception system based on a VO₂ optical switch. *Adv. Funct. Mater.* **33**, 2210251.
+- **[Advanced Functional Materials · 2022](https://doi.org/10.1002/adfm.202208131)** — A latent-fire-detecting olfactory system enabled by ultra-fast and sub-ppm ammonia-responsive Ti₃C₂Tₓ MXene/MoS₂ sensors. *Adv. Funct. Mater.* **32**, 2208131.
+- **[Advanced Functional Materials · 2019](https://doi.org/10.1002/adfm.201806586)** — Bioinspired color-changing molecular sensor toward early fire detection based on transformation of phthalonitrile to phthalocyanine. *Adv. Funct. Mater.* **29**, 1806586.
+
+<p align="right"><a href="https://scholar.google.com/citations?user=ubRZDWEAAAAJ">Complete publication record → Google Scholar</a></p>
 
 ## Collaboration
 
