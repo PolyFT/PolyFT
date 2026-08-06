@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="320" viewBox="0 0 1200 320" role="img" aria-labelledby="title desc">
+  <title id="title">Teng Fu — AI for Polymer Science and Fire Safety</title>
+  <desc id="desc">Minimal academic banner in red and blue for the PolyFT GitHub profile.</desc>
+  <rect width="1200" height="320" fill="#ffffff"/>
+  <rect x="0" y="0" width="1200" height="8" fill="#b4202a"/>
+  <rect x="0" y="8" width="1200" height="4" fill="#1f5f99"/>
+
+  <g opacity="0.92" fill="none" stroke="#1f5f99" stroke-width="3">
+    <path d="M64 92 L101 70 L138 92 L138 135 L101 157 L64 135 Z"/>
+    <path d="M101 70 L101 42"/>
+    <path d="M138 92 L168 75"/>
+    <path d="M138 135 L168 152"/>
+    <circle cx="101" cy="42" r="6" fill="#1f5f99" stroke="none"/>
+    <circle cx="168" cy="75" r="6" fill="#b4202a" stroke="none"/>
+    <circle cx="168" cy="152" r="6" fill="#1f5f99" stroke="none"/>
+  </g>
+
+  <g opacity="0.9" fill="none" stroke-linecap="round">
+    <path d="M1038 64 C1072 92 1016 113 1053 142 C1084 166 1076 197 1051 220" stroke="#b4202a" stroke-width="4"/>
+    <path d="M1090 53 C1119 82 1075 108 1105 133 C1133 157 1122 188 1097 212" stroke="#1f5f99" stroke-width="3"/>
+    <path d="M990 88 C1015 108 985 130 1010 150 C1037 172 1027 198 1008 216" stroke="#7b8794" stroke-width="2"/>
+  </g>
+
+  <text x="220" y="78" fill="#1f5f99" font-family="Arial, 'Helvetica Neue', 'PingFang SC', 'Microsoft YaHei', sans-serif" font-size="18" font-weight="700" letter-spacing="3.2">POLYMER INFORMATICS · FIRE-SAFE MATERIALS</text>
+  <text x="220" y="147" fill="#172b3a" font-family="Arial, 'Helvetica Neue', sans-serif" font-size="54" font-weight="700">TENG FU <tspan fill="#b4202a">· POLYFT</tspan></text>
+  <text x="220" y="190" fill="#40576a" font-family="Arial, 'Helvetica Neue', sans-serif" font-size="26">AI for Polymer Science and Fire-Safe Materials</text>
+
+  <line x1="220" y1="220" x2="980" y2="220" stroke="#d9e1e8" stroke-width="2"/>
+  <g font-family="Arial, 'Helvetica Neue', sans-serif" font-size="16" font-weight="700">
+    <text x="220" y="259" fill="#1f5f99">STRUCTURE</text>
+    <text x="425" y="259" fill="#1f5f99">MECHANISM</text>
+    <text x="645" y="259" fill="#1f5f99">PERFORMANCE</text>
+    <text x="880" y="259" fill="#b4202a">DESIGN</text>
+  </g>
+  <g fill="#96a5b1">
+    <circle cx="376" cy="253" r="3"/>
+    <circle cx="592" cy="253" r="3"/>
+    <circle cx="827" cy="253" r="3"/>
+  </g>
+</svg>
