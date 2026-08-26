@@ -18,7 +18,10 @@ from urllib3.exceptions import InsecureRequestWarning
 BASE_URL = "https://kd.nsfc.cn"
 ENDPOINT = BASE_URL + "/api/baseQuery/completionQueryResultsData"
 DES_KEY = b"IFROMC86"
-RETRYABLE = {408, 425, 429, 500, 502, 503, 504}
+# The endpoint may temporarily return 403 when several independent partitions
+# are active.  A later sequential broad scan should back off rather than treat
+# that transient response as a permanent access denial.
+RETRYABLE = {403, 408, 425, 429, 500, 502, 503, 504}
 requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 
 
@@ -83,7 +86,7 @@ def query(session: requests.Session, year: int, retries: int) -> int:
         "Origin": BASE_URL,
         "Referer": BASE_URL + "/finalProjectInit",
         "Authorization": "Bearer false",
-        "User-Agent": "PolyFT/nsfc-e-broad-total-scan/1.0",
+        "User-Agent": "PolyFT/nsfc-e-broad-total-scan/1.1",
     }
     for attempt in range(retries):
         try:
@@ -114,7 +117,21 @@ def query(session: requests.Session, year: int, retries: int) -> int:
                 raise
             if attempt + 1 >= retries:
                 raise RuntimeError(f"broad E scan failed for {year}: {exc}") from exc
-            time.sleep(min(30.0, 1.5 * (2**attempt)) + random.uniform(0, 0.35))
+            delay = min(120.0, 3.0 * (2**attempt)) + random.uniform(0, 1.0)
+            print(
+                json.dumps(
+                    {
+                        "query_code": "E",
+                        "conclusion_year": year,
+                        "retry": attempt + 1,
+                        "status": status,
+                        "delay_seconds": round(delay, 2),
+                    },
+                    ensure_ascii=False,
+                ),
+                flush=True,
+            )
+            time.sleep(delay)
     raise RuntimeError("unreachable")
 
 
@@ -122,8 +139,8 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--start-conclusion-year", type=int, default=1987)
     parser.add_argument("--end-conclusion-year", type=int, default=2024)
-    parser.add_argument("--delay", type=float, default=0.5)
-    parser.add_argument("--retries", type=int, default=8)
+    parser.add_argument("--delay", type=float, default=1.0)
+    parser.add_argument("--retries", type=int, default=10)
     parser.add_argument("--output", required=True)
     args = parser.parse_args()
 
