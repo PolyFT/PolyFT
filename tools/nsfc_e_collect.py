@@ -3,8 +3,8 @@
 
 The endpoint is public and does not require bypassing CAPTCHA or authentication.
 The output is an official completed-project evidence subset, not all awarded E
-projects.  E01--E13 partitioning is required because the public endpoint exposes
-at most 100 pages for one query.
+projects.  The query code may be a first-level code such as E03 or a finer code
+such as E0501 when the public endpoint's 100-page cap requires subdivision.
 """
 from __future__ import annotations
 
@@ -30,7 +30,9 @@ from urllib3.exceptions import InsecureRequestWarning
 BASE_URL = "https://kd.nsfc.cn"
 ENDPOINT = BASE_URL + "/api/baseQuery/completionQueryResultsData"
 DES_KEY = b"IFROMC86"
-RETRYABLE = {408, 425, 429, 500, 502, 503, 504}
+# Concurrent partition jobs can occasionally receive transient 403 responses.
+# They are retried with exponential backoff; a persistent 403 still fails the job.
+RETRYABLE = {403, 408, 425, 429, 500, 502, 503, 504}
 MAX_PUBLIC_PAGES = 100
 FIELDS = [
     "approval_number",
@@ -116,7 +118,7 @@ def post_json(session: requests.Session, payload: dict[str, Any], retries: int) 
         "Origin": BASE_URL,
         "Referer": BASE_URL + "/finalProjectInit",
         "Authorization": "Bearer false",
-        "User-Agent": "PolyFT/nsfc-e-completed-base/1.1",
+        "User-Agent": "PolyFT/nsfc-e-completed-base/1.2",
     }
     last_error: Exception | None = None
     for attempt in range(retries):
@@ -143,7 +145,22 @@ def post_json(session: requests.Session, payload: dict[str, Any], retries: int) 
                 raise RuntimeError(
                     f"request failed after {retries} attempts: {exc}"
                 ) from exc
-            time.sleep(min(30.0, 1.5 * (2**attempt)) + random.uniform(0, 0.35))
+            delay = min(120.0, 2.0 * (2**attempt)) + random.uniform(0, 0.8)
+            print(
+                json.dumps(
+                    {
+                        "query_code": payload.get("code"),
+                        "conclusion_year": payload.get("conclusionYear"),
+                        "page": payload.get("pageNum"),
+                        "retry": attempt + 1,
+                        "status": status,
+                        "delay_seconds": round(delay, 2),
+                    },
+                    ensure_ascii=False,
+                ),
+                flush=True,
+            )
+            time.sleep(delay)
     raise RuntimeError(f"request failed: {last_error}")
 
 
@@ -244,18 +261,22 @@ def write_sqlite(path: Path, records: list[dict[str, Any]]) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--code", required=True, help="E01 through E13")
+    parser.add_argument(
+        "--code",
+        required=True,
+        help="An E application-code prefix, e.g. E03, E0501, or E050101",
+    )
     parser.add_argument("--start-conclusion-year", type=int, required=True)
     parser.add_argument("--end-conclusion-year", type=int, required=True)
     parser.add_argument("--page-size", type=int, default=10)
     parser.add_argument("--delay", type=float, default=0.55)
-    parser.add_argument("--retries", type=int, default=8)
+    parser.add_argument("--retries", type=int, default=10)
     parser.add_argument("--output-dir", required=True)
     args = parser.parse_args()
 
     code = args.code.strip().upper()
-    if not re.fullmatch(r"E(?:0[1-9]|1[0-3])", code):
-        raise SystemExit("--code must be one of E01 through E13")
+    if not re.fullmatch(r"E\d{2,6}", code):
+        raise SystemExit("--code must be an E application-code prefix such as E03 or E0501")
     if args.start_conclusion_year < 1986 or args.end_conclusion_year < args.start_conclusion_year:
         raise SystemExit("invalid conclusion-year range")
     if not 1 <= args.page_size <= 10:
@@ -326,7 +347,9 @@ def main() -> None:
                     record = normalize_row(row, code)
                     approval = record["approval_number"]
                     app_code = record["application_code_1"]
-                    returned_code_prefixes[app_code[:3] if app_code else ""] += 1
+                    returned_code_prefixes[
+                        app_code[: max(3, len(code))] if app_code else ""
+                    ] += 1
                     if app_code and not app_code.startswith(code):
                         contamination_rows += 1
                         contamination_handle.write(
@@ -411,7 +434,7 @@ def main() -> None:
         "as_of": utc_now(),
         "query_code": code,
         "scope": "NSFC public completed-project endpoint only",
-        "partition_strategy": "E01-E13 because the endpoint caps one query at 100 pages",
+        "partition_strategy": "application-code prefix selected to stay below the public 100-page cap",
         "start_conclusion_year": args.start_conclusion_year,
         "end_conclusion_year": args.end_conclusion_year,
         "raw_rows": raw_rows,
