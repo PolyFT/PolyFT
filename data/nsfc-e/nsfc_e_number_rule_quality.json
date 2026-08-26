@@ -1,0 +1,31 @@
+{
+  "generated_at": "2026-08-26T14:12:19+00:00",
+  "records": 94761,
+  "parsed_format_rate": 0.9983432002617111,
+  "format_counts": {
+    "numeric8": 93544,
+    "alpha_numeric": 1060,
+    "other": 157
+  },
+  "encoded_year_match_counts": {
+    "true": 94604,
+    "unknown": 157
+  },
+  "encoded_year_match_rate_when_available": 1.0,
+  "project_type_counts": {
+    "youth_c": 39029,
+    "special": 1564,
+    "key": 1564,
+    "regional": 3967,
+    "general": 46085,
+    "joint_fund": 1572,
+    "major_research_plan": 980
+  },
+  "unmapped_project_type_records": 0,
+  "segment_count": 2498,
+  "template_rule_count": 656,
+  "transition_count": 431,
+  "ambiguity_count": 267,
+  "dense_gap_probe_count": 655,
+  "data_boundary": "official public completed-project subset only"
+}

@@ -1,0 +1,543 @@
+{
+  "generated_at": "2026-08-26T14:12:16+00:00",
+  "scope": "NSFC public completed-project endpoint; primary application codes E01-E13",
+  "conclusion_year_start": 1986,
+  "conclusion_year_end": 2026,
+  "reconciliation_mode": "explicit_official_nonoverlapping_partition_plan",
+  "independent_broad_root_scan": {
+    "status": "not_used",
+    "reason": "GitHub-hosted runners returned persistent HTTP 403 for the broad code=E query"
+  },
+  "partition_plan": {
+    "schema_version": "1.1",
+    "dataset_scope": "NSFC public completed-project endpoint, primary application codes E01-E13",
+    "notes": [
+      "First-level E05 exceeds the public endpoint's 100-page cap from conclusion year 2015 onward.",
+      "E05 is therefore collected as a historical root partition through 2014 and as E0501-E0512 partitions from 2015 onward.",
+      "First-level E08 exceeds the public endpoint's 100-page cap from conclusion year 2022 onward.",
+      "E08 is therefore collected as a historical root partition through 2021 and as E0801-E0810 partitions from 2022 onward.",
+      "The selected partitions are explicit, non-overlapping leaves/windows of the official application-code hierarchy."
+    ],
+    "partitions": [
+      {
+        "code": "E01",
+        "start_conclusion_year": 1986,
+        "end_conclusion_year": 2026
+      },
+      {
+        "code": "E02",
+        "start_conclusion_year": 1986,
+        "end_conclusion_year": 2026
+      },
+      {
+        "code": "E03",
+        "start_conclusion_year": 1986,
+        "end_conclusion_year": 2026
+      },
+      {
+        "code": "E04",
+        "start_conclusion_year": 1986,
+        "end_conclusion_year": 2026
+      },
+      {
+        "code": "E05",
+        "start_conclusion_year": 1986,
+        "end_conclusion_year": 2014,
+        "notes": "Historical root partition; later years are subdivided."
+      },
+      {
+        "code": "E0501",
+        "start_conclusion_year": 2015,
+        "end_conclusion_year": 2026
+      },
+      {
+        "code": "E0502",
+        "start_conclusion_year": 2015,
+        "end_conclusion_year": 2026
+      },
+      {
+        "code": "E0503",
+        "start_conclusion_year": 2015,
+        "end_conclusion_year": 2026
+      },
+      {
+        "code": "E0504",
+        "start_conclusion_year": 2015,
+        "end_conclusion_year": 2026
+      },
+      {
+        "code": "E0505",
+        "start_conclusion_year": 2015,
+        "end_conclusion_year": 2026
+      },
+      {
+        "code": "E0506",
+        "start_conclusion_year": 2015,
+        "end_conclusion_year": 2026
+      },
+      {
+        "code": "E0507",
+        "start_conclusion_year": 2015,
+        "end_conclusion_year": 2026
+      },
+      {
+        "code": "E0508",
+        "start_conclusion_year": 2015,
+        "end_conclusion_year": 2026
+      },
+      {
+        "code": "E0509",
+        "start_conclusion_year": 2015,
+        "end_conclusion_year": 2026
+      },
+      {
+        "code": "E0510",
+        "start_conclusion_year": 2015,
+        "end_conclusion_year": 2026
+      },
+      {
+        "code": "E0511",
+        "start_conclusion_year": 2015,
+        "end_conclusion_year": 2026
+      },
+      {
+        "code": "E0512",
+        "start_conclusion_year": 2015,
+        "end_conclusion_year": 2026
+      },
+      {
+        "code": "E06",
+        "start_conclusion_year": 1986,
+        "end_conclusion_year": 2026
+      },
+      {
+        "code": "E07",
+        "start_conclusion_year": 1986,
+        "end_conclusion_year": 2026
+      },
+      {
+        "code": "E08",
+        "start_conclusion_year": 1986,
+        "end_conclusion_year": 2021,
+        "notes": "Historical root partition; later years are subdivided."
+      },
+      {
+        "code": "E0801",
+        "start_conclusion_year": 2022,
+        "end_conclusion_year": 2026
+      },
+      {
+        "code": "E0802",
+        "start_conclusion_year": 2022,
+        "end_conclusion_year": 2026
+      },
+      {
+        "code": "E0803",
+        "start_conclusion_year": 2022,
+        "end_conclusion_year": 2026
+      },
+      {
+        "code": "E0804",
+        "start_conclusion_year": 2022,
+        "end_conclusion_year": 2026
+      },
+      {
+        "code": "E0805",
+        "start_conclusion_year": 2022,
+        "end_conclusion_year": 2026
+      },
+      {
+        "code": "E0806",
+        "start_conclusion_year": 2022,
+        "end_conclusion_year": 2026
+      },
+      {
+        "code": "E0807",
+        "start_conclusion_year": 2022,
+        "end_conclusion_year": 2026
+      },
+      {
+        "code": "E0808",
+        "start_conclusion_year": 2022,
+        "end_conclusion_year": 2026
+      },
+      {
+        "code": "E0809",
+        "start_conclusion_year": 2022,
+        "end_conclusion_year": 2026
+      },
+      {
+        "code": "E0810",
+        "start_conclusion_year": 2022,
+        "end_conclusion_year": 2026
+      },
+      {
+        "code": "E09",
+        "start_conclusion_year": 1986,
+        "end_conclusion_year": 2026
+      },
+      {
+        "code": "E10",
+        "start_conclusion_year": 1986,
+        "end_conclusion_year": 2026
+      },
+      {
+        "code": "E11",
+        "start_conclusion_year": 1986,
+        "end_conclusion_year": 2026
+      },
+      {
+        "code": "E12",
+        "start_conclusion_year": 1986,
+        "end_conclusion_year": 2026
+      },
+      {
+        "code": "E13",
+        "start_conclusion_year": 1986,
+        "end_conclusion_year": 2026
+      }
+    ]
+  },
+  "partition_summaries": [
+    {
+      "code": "E01",
+      "start_conclusion_year": 1986,
+      "end_conclusion_year": 2026,
+      "reported_total": 8575,
+      "unique_approval_numbers": 8575,
+      "coverage_file": "downloaded/main/nsfc-e-partition-E01/e01/nsfc_e01_completed_1986-2026_coverage.json"
+    },
+    {
+      "code": "E02",
+      "start_conclusion_year": 1986,
+      "end_conclusion_year": 2026,
+      "reported_total": 10885,
+      "unique_approval_numbers": 10885,
+      "coverage_file": "downloaded/main/nsfc-e-partition-E02/e02/nsfc_e02_completed_1986-2026_coverage.json"
+    },
+    {
+      "code": "E03",
+      "start_conclusion_year": 1986,
+      "end_conclusion_year": 2026,
+      "reported_total": 7457,
+      "unique_approval_numbers": 7457,
+      "coverage_file": "downloaded/main/nsfc-e-partition-E03/e03/nsfc_e03_completed_1986-2026_coverage.json"
+    },
+    {
+      "code": "E04",
+      "start_conclusion_year": 1986,
+      "end_conclusion_year": 2026,
+      "reported_total": 9835,
+      "unique_approval_numbers": 9835,
+      "coverage_file": "downloaded/main/nsfc-e-partition-E04/e04/nsfc_e04_completed_1986-2026_coverage.json"
+    },
+    {
+      "code": "E05",
+      "start_conclusion_year": 1986,
+      "end_conclusion_year": 2014,
+      "reported_total": 5748,
+      "unique_approval_numbers": 5748,
+      "coverage_file": "downloaded/e05/nsfc-e-refined-E05-root-1986-2014/nsfc_e05_completed_1986-2014_coverage.json"
+    },
+    {
+      "code": "E0501",
+      "start_conclusion_year": 2015,
+      "end_conclusion_year": 2026,
+      "reported_total": 738,
+      "unique_approval_numbers": 738,
+      "coverage_file": "downloaded/e05/nsfc-e-refined-E0501-2015-2026/e0501-2015-2026/nsfc_e0501_completed_2015-2026_coverage.json"
+    },
+    {
+      "code": "E0502",
+      "start_conclusion_year": 2015,
+      "end_conclusion_year": 2026,
+      "reported_total": 767,
+      "unique_approval_numbers": 767,
+      "coverage_file": "downloaded/e05/nsfc-e-refined-E0502-2015-2026/e0502-2015-2026/nsfc_e0502_completed_2015-2026_coverage.json"
+    },
+    {
+      "code": "E0503",
+      "start_conclusion_year": 2015,
+      "end_conclusion_year": 2026,
+      "reported_total": 1707,
+      "unique_approval_numbers": 1707,
+      "coverage_file": "downloaded/e05/nsfc-e-refined-E0503-2015-2026/e0503-2015-2026/nsfc_e0503_completed_2015-2026_coverage.json"
+    },
+    {
+      "code": "E0504",
+      "start_conclusion_year": 2015,
+      "end_conclusion_year": 2026,
+      "reported_total": 568,
+      "unique_approval_numbers": 568,
+      "coverage_file": "downloaded/e05/nsfc-e-refined-E0504-2015-2026/e0504-2015-2026/nsfc_e0504_completed_2015-2026_coverage.json"
+    },
+    {
+      "code": "E0505",
+      "start_conclusion_year": 2015,
+      "end_conclusion_year": 2026,
+      "reported_total": 1087,
+      "unique_approval_numbers": 1087,
+      "coverage_file": "downloaded/e05/nsfc-e-refined-E0505-2015-2026/e0505-2015-2026/nsfc_e0505_completed_2015-2026_coverage.json"
+    },
+    {
+      "code": "E0506",
+      "start_conclusion_year": 2015,
+      "end_conclusion_year": 2026,
+      "reported_total": 1159,
+      "unique_approval_numbers": 1159,
+      "coverage_file": "downloaded/e05/nsfc-e-refined-E0506-2015-2026/e0506-2015-2026/nsfc_e0506_completed_2015-2026_coverage.json"
+    },
+    {
+      "code": "E0507",
+      "start_conclusion_year": 2015,
+      "end_conclusion_year": 2026,
+      "reported_total": 458,
+      "unique_approval_numbers": 458,
+      "coverage_file": "downloaded/e05/nsfc-e-refined-E0507-2015-2026/e0507-2015-2026/nsfc_e0507_completed_2015-2026_coverage.json"
+    },
+    {
+      "code": "E0508",
+      "start_conclusion_year": 2015,
+      "end_conclusion_year": 2026,
+      "reported_total": 1680,
+      "unique_approval_numbers": 1680,
+      "coverage_file": "downloaded/e05/nsfc-e-refined-E0508-2015-2026/e0508-2015-2026/nsfc_e0508_completed_2015-2026_coverage.json"
+    },
+    {
+      "code": "E0509",
+      "start_conclusion_year": 2015,
+      "end_conclusion_year": 2026,
+      "reported_total": 1439,
+      "unique_approval_numbers": 1439,
+      "coverage_file": "downloaded/e05/nsfc-e-refined-E0509-2015-2026/e0509-2015-2026/nsfc_e0509_completed_2015-2026_coverage.json"
+    },
+    {
+      "code": "E0510",
+      "start_conclusion_year": 2015,
+      "end_conclusion_year": 2026,
+      "reported_total": 832,
+      "unique_approval_numbers": 832,
+      "coverage_file": "downloaded/e05/nsfc-e-refined-E0510-2015-2026/e0510-2015-2026/nsfc_e0510_completed_2015-2026_coverage.json"
+    },
+    {
+      "code": "E0511",
+      "start_conclusion_year": 2015,
+      "end_conclusion_year": 2026,
+      "reported_total": 744,
+      "unique_approval_numbers": 744,
+      "coverage_file": "downloaded/e05/nsfc-e-refined-E0511-2015-2026/e0511-2015-2026/nsfc_e0511_completed_2015-2026_coverage.json"
+    },
+    {
+      "code": "E0512",
+      "start_conclusion_year": 2015,
+      "end_conclusion_year": 2026,
+      "reported_total": 563,
+      "unique_approval_numbers": 563,
+      "coverage_file": "downloaded/e05/nsfc-e-refined-E0512-2015-2026/e0512-2015-2026/nsfc_e0512_completed_2015-2026_coverage.json"
+    },
+    {
+      "code": "E06",
+      "start_conclusion_year": 1986,
+      "end_conclusion_year": 2026,
+      "reported_total": 7979,
+      "unique_approval_numbers": 7979,
+      "coverage_file": "downloaded/main/nsfc-e-partition-E06/e06/nsfc_e06_completed_1986-2026_coverage.json"
+    },
+    {
+      "code": "E07",
+      "start_conclusion_year": 1986,
+      "end_conclusion_year": 2026,
+      "reported_total": 6286,
+      "unique_approval_numbers": 6286,
+      "coverage_file": "downloaded/main/nsfc-e-partition-E07/e07/nsfc_e07_completed_1986-2026_coverage.json"
+    },
+    {
+      "code": "E08",
+      "start_conclusion_year": 1986,
+      "end_conclusion_year": 2021,
+      "reported_total": 10140,
+      "unique_approval_numbers": 10140,
+      "coverage_file": "downloaded/e08/nsfc-e-refined-E08-root-1986-2021/nsfc_e08_completed_1986-2021_coverage.json"
+    },
+    {
+      "code": "E0801",
+      "start_conclusion_year": 2022,
+      "end_conclusion_year": 2026,
+      "reported_total": 297,
+      "unique_approval_numbers": 297,
+      "coverage_file": "downloaded/e08/nsfc-e-refined-E0801-2022-2026/e0801-2022-2026/nsfc_e0801_completed_2022-2026_coverage.json"
+    },
+    {
+      "code": "E0802",
+      "start_conclusion_year": 2022,
+      "end_conclusion_year": 2026,
+      "reported_total": 312,
+      "unique_approval_numbers": 312,
+      "coverage_file": "downloaded/e08/nsfc-e-refined-E0802-2022-2026/e0802-2022-2026/nsfc_e0802_completed_2022-2026_coverage.json"
+    },
+    {
+      "code": "E0803",
+      "start_conclusion_year": 2022,
+      "end_conclusion_year": 2026,
+      "reported_total": 223,
+      "unique_approval_numbers": 223,
+      "coverage_file": "downloaded/e08/nsfc-e-refined-E0803-2022-2026/e0803-2022-2026/nsfc_e0803_completed_2022-2026_coverage.json"
+    },
+    {
+      "code": "E0804",
+      "start_conclusion_year": 2022,
+      "end_conclusion_year": 2026,
+      "reported_total": 551,
+      "unique_approval_numbers": 551,
+      "coverage_file": "downloaded/e08/nsfc-e-refined-E0804-2022-2026/e0804-2022-2026/nsfc_e0804_completed_2022-2026_coverage.json"
+    },
+    {
+      "code": "E0805",
+      "start_conclusion_year": 2022,
+      "end_conclusion_year": 2026,
+      "reported_total": 421,
+      "unique_approval_numbers": 421,
+      "coverage_file": "downloaded/e08/nsfc-e-refined-E0805-2022-2026/e0805-2022-2026/nsfc_e0805_completed_2022-2026_coverage.json"
+    },
+    {
+      "code": "E0806",
+      "start_conclusion_year": 2022,
+      "end_conclusion_year": 2026,
+      "reported_total": 222,
+      "unique_approval_numbers": 222,
+      "coverage_file": "downloaded/e08/nsfc-e-refined-E0806-2022-2026/e0806-2022-2026/nsfc_e0806_completed_2022-2026_coverage.json"
+    },
+    {
+      "code": "E0807",
+      "start_conclusion_year": 2022,
+      "end_conclusion_year": 2026,
+      "reported_total": 338,
+      "unique_approval_numbers": 338,
+      "coverage_file": "downloaded/e08/nsfc-e-refined-E0807-2022-2026/e0807-2022-2026/nsfc_e0807_completed_2022-2026_coverage.json"
+    },
+    {
+      "code": "E0808",
+      "start_conclusion_year": 2022,
+      "end_conclusion_year": 2026,
+      "reported_total": 161,
+      "unique_approval_numbers": 161,
+      "coverage_file": "downloaded/e08/nsfc-e-refined-E0808-2022-2026/e0808-2022-2026/nsfc_e0808_completed_2022-2026_coverage.json"
+    },
+    {
+      "code": "E0809",
+      "start_conclusion_year": 2022,
+      "end_conclusion_year": 2026,
+      "reported_total": 280,
+      "unique_approval_numbers": 280,
+      "coverage_file": "downloaded/e08/nsfc-e-refined-E0809-2022-2026/e0809-2022-2026/nsfc_e0809_completed_2022-2026_coverage.json"
+    },
+    {
+      "code": "E0810",
+      "start_conclusion_year": 2022,
+      "end_conclusion_year": 2026,
+      "reported_total": 324,
+      "unique_approval_numbers": 324,
+      "coverage_file": "downloaded/e08/nsfc-e-refined-E0810-2022-2026/e0810-2022-2026/nsfc_e0810_completed_2022-2026_coverage.json"
+    },
+    {
+      "code": "E09",
+      "start_conclusion_year": 1986,
+      "end_conclusion_year": 2026,
+      "reported_total": 5309,
+      "unique_approval_numbers": 5309,
+      "coverage_file": "downloaded/main/nsfc-e-partition-E09/e09/nsfc_e09_completed_1986-2026_coverage.json"
+    },
+    {
+      "code": "E10",
+      "start_conclusion_year": 1986,
+      "end_conclusion_year": 2026,
+      "reported_total": 5126,
+      "unique_approval_numbers": 5126,
+      "coverage_file": "downloaded/main/nsfc-e-partition-E10/e10/nsfc_e10_completed_1986-2026_coverage.json"
+    },
+    {
+      "code": "E11",
+      "start_conclusion_year": 1986,
+      "end_conclusion_year": 2026,
+      "reported_total": 1966,
+      "unique_approval_numbers": 1966,
+      "coverage_file": "downloaded/main/nsfc-e-partition-E11/e11/nsfc_e11_completed_1986-2026_coverage.json"
+    },
+    {
+      "code": "E12",
+      "start_conclusion_year": 1986,
+      "end_conclusion_year": 2026,
+      "reported_total": 307,
+      "unique_approval_numbers": 307,
+      "coverage_file": "downloaded/main/nsfc-e-partition-E12/e12/nsfc_e12_completed_1986-2026_coverage.json"
+    },
+    {
+      "code": "E13",
+      "start_conclusion_year": 1986,
+      "end_conclusion_year": 2026,
+      "reported_total": 277,
+      "unique_approval_numbers": 277,
+      "coverage_file": "downloaded/main/nsfc-e-partition-E13/e13/nsfc_e13_completed_1986-2026_coverage.json"
+    }
+  ],
+  "annual_partition_totals": {
+    "1986": 0,
+    "1987": 1,
+    "1988": 42,
+    "1989": 423,
+    "1990": 467,
+    "1991": 447,
+    "1992": 474,
+    "1993": 536,
+    "1994": 501,
+    "1995": 591,
+    "1996": 644,
+    "1997": 614,
+    "1998": 552,
+    "1999": 547,
+    "2000": 582,
+    "2001": 625,
+    "2002": 682,
+    "2003": 708,
+    "2004": 824,
+    "2005": 1088,
+    "2006": 1120,
+    "2007": 1263,
+    "2008": 1472,
+    "2009": 1690,
+    "2010": 1953,
+    "2011": 2519,
+    "2012": 2990,
+    "2013": 4008,
+    "2014": 2575,
+    "2015": 5461,
+    "2016": 5983,
+    "2017": 6174,
+    "2018": 5944,
+    "2019": 6244,
+    "2020": 6522,
+    "2021": 6811,
+    "2022": 6953,
+    "2023": 7007,
+    "2024": 7724,
+    "2025": 0,
+    "2026": 0
+  },
+  "reported_total_sum": 94761,
+  "unique_approval_numbers": 94761,
+  "number_learning_observations": 94761,
+  "duplicate_identical": 0,
+  "duplicate_conflicts": 0,
+  "project_type_counts": {
+    "youth_c": 39029,
+    "special": 1564,
+    "key": 1564,
+    "regional": 3967,
+    "general": 46085,
+    "joint_fund": 1572,
+    "major_research_plan": 980
+  },
+  "complete": true,
+  "completeness_status": "complete_within_explicit_public_completed_project_partition_plan",
+  "data_boundary": "Does not include active or otherwise not-yet-completed awards."
+}
