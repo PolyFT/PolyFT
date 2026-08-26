@@ -1,0 +1,22 @@
+name: NSFC E public-runner diagnostic
+
+on:
+  push:
+    branches: [nsfc-e-data-runner]
+    paths:
+      - ".github/workflows/nsfc-e-diagnostic.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnostic:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Environment
+        run: |
+          python --version
+          curl -I --max-time 30 https://kd.nsfc.cn/ || true
+          echo "public runner started"
