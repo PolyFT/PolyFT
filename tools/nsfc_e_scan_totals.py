@@ -19,9 +19,6 @@ from urllib3.exceptions import InsecureRequestWarning
 BASE_URL = "https://kd.nsfc.cn"
 ENDPOINT = BASE_URL + "/api/baseQuery/completionQueryResultsData"
 DES_KEY = b"IFROMC86"
-# The endpoint may temporarily return 403 when several independent partitions
-# are active. A later sequential scan should back off rather than treat that
-# transient response as a permanent access denial.
 RETRYABLE = {403, 408, 425, 429, 500, 502, 503, 504}
 requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 
@@ -62,7 +59,7 @@ def payload(code: str, year: int) -> dict[str, Any]:
         "dependUnit": "",
         "keywords": "",
         "pageNum": 0,
-        "pageSize": 1,
+        "pageSize": 10,
         "personInCharge": "",
         "projectName": "",
         "projectType": "",
@@ -80,19 +77,14 @@ def payload(code: str, year: int) -> dict[str, Any]:
     }
 
 
-def query(
-    session: requests.Session,
-    code: str,
-    year: int,
-    retries: int,
-) -> int:
+def query(session: requests.Session, code: str, year: int, retries: int) -> int:
     headers = {
         "Accept": "application/json, text/plain, */*",
         "Content-Type": "application/json",
         "Origin": BASE_URL,
         "Referer": BASE_URL + "/finalProjectInit",
         "Authorization": "Bearer false",
-        "User-Agent": "PolyFT/nsfc-e-total-scan/1.2",
+        "User-Agent": "PolyFT/nsfc-e-total-scan/1.3",
     }
     for attempt in range(retries):
         try:
@@ -125,7 +117,7 @@ def query(
                 raise RuntimeError(
                     f"total scan failed for code={code}, year={year}: {exc}"
                 ) from exc
-            delay = min(120.0, 3.0 * (2**attempt)) + random.uniform(0, 1.0)
+            delay = min(90.0, 2.0 * (2**attempt)) + random.uniform(0, 1.0)
             print(
                 json.dumps(
                     {
