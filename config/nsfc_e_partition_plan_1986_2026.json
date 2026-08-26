@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0",
+  "dataset_scope": "NSFC public completed-project endpoint, primary application codes E01-E13",
+  "notes": [
+    "First-level E05 exceeds the public endpoint's 100-page cap from conclusion year 2015 onward.",
+    "E05 is therefore collected as a historical root partition through 2014 and as E0501-E0512 partitions from 2015 onward.",
+    "All other E01-E13 first-level partitions remain below the cap in the observed 1986-2026 conclusion-year window."
+  ],
+  "partitions": [
+    {"code": "E01", "start_conclusion_year": 1986, "end_conclusion_year": 2026},
+    {"code": "E02", "start_conclusion_year": 1986, "end_conclusion_year": 2026},
+    {"code": "E03", "start_conclusion_year": 1986, "end_conclusion_year": 2026},
+    {"code": "E04", "start_conclusion_year": 1986, "end_conclusion_year": 2026},
+    {"code": "E05", "start_conclusion_year": 1986, "end_conclusion_year": 2014, "notes": "Historical root partition; later years are subdivided."},
+    {"code": "E0501", "start_conclusion_year": 2015, "end_conclusion_year": 2026},
+    {"code": "E0502", "start_conclusion_year": 2015, "end_conclusion_year": 2026},
+    {"code": "E0503", "start_conclusion_year": 2015, "end_conclusion_year": 2026},
+    {"code": "E0504", "start_conclusion_year": 2015, "end_conclusion_year": 2026},
+    {"code": "E0505", "start_conclusion_year": 2015, "end_conclusion_year": 2026},
+    {"code": "E0506", "start_conclusion_year": 2015, "end_conclusion_year": 2026},
+    {"code": "E0507", "start_conclusion_year": 2015, "end_conclusion_year": 2026},
+    {"code": "E0508", "start_conclusion_year": 2015, "end_conclusion_year": 2026},
+    {"code": "E0509", "start_conclusion_year": 2015, "end_conclusion_year": 2026},
+    {"code": "E0510", "start_conclusion_year": 2015, "end_conclusion_year": 2026},
+    {"code": "E0511", "start_conclusion_year": 2015, "end_conclusion_year": 2026},
+    {"code": "E0512", "start_conclusion_year": 2015, "end_conclusion_year": 2026},
+    {"code": "E06", "start_conclusion_year": 1986, "end_conclusion_year": 2026},
+    {"code": "E07", "start_conclusion_year": 1986, "end_conclusion_year": 2026},
+    {"code": "E08", "start_conclusion_year": 1986, "end_conclusion_year": 2026},
+    {"code": "E09", "start_conclusion_year": 1986, "end_conclusion_year": 2026},
+    {"code": "E10", "start_conclusion_year": 1986, "end_conclusion_year": 2026},
+    {"code": "E11", "start_conclusion_year": 1986, "end_conclusion_year": 2026},
+    {"code": "E12", "start_conclusion_year": 1986, "end_conclusion_year": 2026},
+    {"code": "E13", "start_conclusion_year": 1986, "end_conclusion_year": 2026}
+  ]
+}
