@@ -18,9 +18,8 @@ concurrency:
 env:
   MAIN_PARTITION_RUN_ID: "32966775117"
   E05_REFINED_RUN_ID: "32968706711"
+  E08_REFINED_RUN_ID: "32974020284"
   RELEASE_TAG: "nsfc-e-official-completed-2026-08-26"
-  START_CONCLUSION_YEAR: "1986"
-  END_CONCLUSION_YEAR: "2026"
 
 jobs:
   finalize:
@@ -31,17 +30,15 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Install runtime dependencies
-        run: python -m pip install --disable-pip-version-check requests pycryptodome
-      - name: Wait for source collection runs
+      - name: Wait for all source collection runs
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          for run_id in "$MAIN_PARTITION_RUN_ID" "$E05_REFINED_RUN_ID"; do
+          for run_id in "$MAIN_PARTITION_RUN_ID" "$E05_REFINED_RUN_ID" "$E08_REFINED_RUN_ID"; do
             echo "Waiting for source run ${run_id}"
             completed=false
-            for attempt in $(seq 1 240); do
+            for attempt in $(seq 1 360); do
               status="$(gh api "/repos/$GITHUB_REPOSITORY/actions/runs/${run_id}" --jq .status)"
               conclusion="$(gh api "/repos/$GITHUB_REPOSITORY/actions/runs/${run_id}" --jq '.conclusion // ""')"
               echo "run=${run_id} status=${status} conclusion=${conclusion} attempt=${attempt}"
@@ -56,20 +53,20 @@ jobs:
               exit 1
             fi
           done
-      - name: Download required E01-E13 artifacts except superseded E05 root
+      - name: Download completed first-level partitions
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           mkdir -p downloaded/main
-          for code in E01 E02 E03 E04 E06 E07 E08 E09 E10 E11 E12 E13; do
+          for code in E01 E02 E03 E04 E06 E07 E09 E10 E11 E12 E13; do
             name="nsfc-e-partition-${code}"
             mkdir -p "downloaded/main/${name}"
             gh run download "$MAIN_PARTITION_RUN_ID" \
               --name "$name" \
               --dir "downloaded/main/${name}"
           done
-      - name: Download refined E05 artifacts
+      - name: Download refined E05 partitions
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -96,31 +93,45 @@ jobs:
               --name "$name" \
               --dir "downloaded/e05/${name}"
           done
+      - name: Download refined E08 partitions
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p downloaded/e08
+          names=(
+            nsfc-e-refined-E08-root-1986-2021
+            nsfc-e-refined-E0801-2022-2026
+            nsfc-e-refined-E0802-2022-2026
+            nsfc-e-refined-E0803-2022-2026
+            nsfc-e-refined-E0804-2022-2026
+            nsfc-e-refined-E0805-2022-2026
+            nsfc-e-refined-E0806-2022-2026
+            nsfc-e-refined-E0807-2022-2026
+            nsfc-e-refined-E0808-2022-2026
+            nsfc-e-refined-E0809-2022-2026
+            nsfc-e-refined-E0810-2022-2026
+          )
+          for name in "${names[@]}"; do
+            mkdir -p "downloaded/e08/${name}"
+            gh run download "$E08_REFINED_RUN_ID" \
+              --name "$name" \
+              --dir "downloaded/e08/${name}"
+          done
           find downloaded -type f | sort
-      - name: Independently scan broad-E annual totals
+      - name: Merge the explicit non-overlapping official partition plan
         run: |
-          python tools/nsfc_e_scan_totals.py \
-            --code E \
-            --start-conclusion-year "$START_CONCLUSION_YEAR" \
-            --end-conclusion-year "$END_CONCLUSION_YEAR" \
-            --delay 1.2 \
-            --retries 10 \
-            --output broad_e_annual_totals.json
-      - name: Merge partitions and enforce annual reconciliation
-        run: |
-          python tools/nsfc_e_merge_plan.py \
+          python tools/nsfc_e_merge_explicit_plan.py \
             --input-root downloaded/main \
             --input-root downloaded/e05 \
+            --input-root downloaded/e08 \
             --partition-plan config/nsfc_e_partition_plan_1986_2026.json \
-            --broad-scan broad_e_annual_totals.json \
             --output-dir outputs/nsfc-e-official-completed-base
       - name: Learn the complete empirical approval-number rule system
         run: |
           python tools/nsfc_e_learn_number_rules.py \
             --master-csv outputs/nsfc-e-official-completed-base/nsfc_e_completed_master.csv.gz \
             --output-dir outputs/nsfc-e-official-completed-base
-          cp broad_e_annual_totals.json \
-            outputs/nsfc-e-official-completed-base/broad_e_annual_totals.json
       - name: Package full dataset for local synchronization
         run: |
           set -euo pipefail
@@ -149,7 +160,6 @@ jobs:
           cp "$src/nsfc_e_number_rule_ambiguities.csv" "$dst/"
           cp "$src/nsfc_e_project_type_values.csv" "$dst/"
           cp "$src/nsfc_e_counts_by_year_code_type.csv" "$dst/"
-          cp "$src/broad_e_annual_totals.json" "$dst/"
           cat > "$dst/LOCAL_SYNC.md" <<'EOF'
           # 本地同步
 
@@ -164,6 +174,7 @@ jobs:
 
           脚本会下载发布包、核验 SHA-256，并原子更新 `data-local/nsfc-e/current`。
           仓库中的 `data/nsfc-e/` 只保存便于 Git 同步和审查的规则、统计、覆盖度及报告。
+          不接入百度网盘或其他网盘。
           EOF
           printf '%s\n' "$RELEASE_TAG" > "$dst/LATEST_RELEASE.txt"
       - name: Commit compact knowledge outputs for git pull synchronization
@@ -197,7 +208,7 @@ jobs:
             gh release create "$RELEASE_TAG" \
               --target nsfc-e-data-runner \
               --title "NSFC E口官方公开已结题基础数据与批准号规律" \
-              --notes "E01-E13公开已结题项目基础数据与完整经验编号规则。分区逐年合计与独立广义E口扫描逐年核对一致。完整数据通过仓库内 tools/sync_nsfc_e_local.py 自动同步到本地，不接入网盘。数据仅代表公开已结题项目，不代表全部获批或在研项目。"
+              --notes "E01-E13公开已结题项目基础数据与经验编号规则。所有显式分区逐页抓取数、有效批准号数与接口报告数一致，代码与年度窗口不重叠。广义E口根查询在GitHub托管运行器持续返回HTTP 403，因此未声称完成该项独立核验。完整数据通过仓库内 tools/sync_nsfc_e_local.py 同步到本地，不接入网盘。"
           fi
           gh release upload "$RELEASE_TAG" \
             nsfc-e-official-completed-base.tar.gz \
