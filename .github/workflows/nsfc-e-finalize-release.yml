@@ -13,7 +13,7 @@ permissions:
 
 concurrency:
   group: nsfc-e-finalize-release
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 env:
   MAIN_PARTITION_RUN_ID: "32966775117"
@@ -104,7 +104,7 @@ jobs:
             --start-conclusion-year "$START_CONCLUSION_YEAR" \
             --end-conclusion-year "$END_CONCLUSION_YEAR" \
             --delay 1.2 \
-            --retries 12 \
+            --retries 10 \
             --output broad_e_annual_totals.json
       - name: Merge partitions and enforce annual reconciliation
         run: |
