@@ -27,6 +27,8 @@ jobs:
     timeout-minutes: 330
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
@@ -187,7 +189,20 @@ jobs:
             echo "No compact knowledge-output changes"
           else
             git commit -m "data: publish NSFC E completed-base rules and audit outputs [skip ci]"
-            git push origin HEAD:nsfc-e-data-runner
+            pushed=false
+            for attempt in $(seq 1 6); do
+              git fetch origin nsfc-e-data-runner
+              git rebase origin/nsfc-e-data-runner
+              if git push origin HEAD:nsfc-e-data-runner; then
+                pushed=true
+                break
+              fi
+              sleep $((attempt * 3))
+            done
+            if [ "$pushed" != "true" ]; then
+              echo "Failed to push compact knowledge outputs after retries" >&2
+              exit 1
+            fi
           fi
       - name: Upload final workflow artifact
         uses: actions/upload-artifact@v4
