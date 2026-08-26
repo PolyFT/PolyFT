@@ -1,0 +1,75 @@
+name: NSFC E08 completed base - refined partitions
+
+on:
+  push:
+    branches: [nsfc-e-data-runner]
+    paths:
+      - ".github/workflows/nsfc-e08-refined-partitions.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nsfc-e08-refined-partitions
+  cancel-in-progress: false
+
+jobs:
+  early-root:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install --disable-pip-version-check requests pycryptodome
+      - name: Collect complete historical E08 root window
+        run: |
+          python tools/nsfc_e_collect.py \
+            --code E08 \
+            --start-conclusion-year 1986 \
+            --end-conclusion-year 2021 \
+            --page-size 10 \
+            --delay 0.65 \
+            --retries 10 \
+            --output-dir outputs/e08-root-1986-2021
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nsfc-e-refined-E08-root-1986-2021
+          path: outputs/e08-root-1986-2021
+          if-no-files-found: error
+          retention-days: 30
+
+  late-subcodes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        code: [E0801, E0802, E0803, E0804, E0805, E0806, E0807, E0808, E0809, E0810]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install --disable-pip-version-check requests pycryptodome
+      - name: Collect late E08 subcode partition
+        run: |
+          code_lower="$(echo '${{ matrix.code }}' | tr '[:upper:]' '[:lower:]')"
+          python tools/nsfc_e_collect.py \
+            --code "${{ matrix.code }}" \
+            --start-conclusion-year 2022 \
+            --end-conclusion-year 2026 \
+            --page-size 10 \
+            --delay 0.65 \
+            --retries 10 \
+            --output-dir "outputs/${code_lower}-2022-2026"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: nsfc-e-refined-${{ matrix.code }}-2022-2026
+          path: outputs
+          if-no-files-found: error
+          retention-days: 30
