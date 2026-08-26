@@ -1,0 +1,186 @@
+name: NSFC E official completed base - E01 to E13
+
+on:
+  push:
+    branches: [nsfc-e-data-runner]
+    paths:
+      - ".github/workflows/nsfc-e-official-completed-partitioned.yml"
+      - "tools/nsfc_e_collect.py"
+      - "tools/nsfc_e_scan_totals.py"
+      - "tools/nsfc_e_merge_partitioned.py"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nsfc-e-official-completed-partitioned
+  cancel-in-progress: false
+
+env:
+  START_CONCLUSION_YEAR: "1986"
+  END_CONCLUSION_YEAR: "2026"
+  RELEASE_TAG: nsfc-e-official-completed-2026-08-26
+
+jobs:
+  broad-scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install runtime dependencies
+        run: python -m pip install --disable-pip-version-check requests pycryptodome
+      - name: Scan independent broad-E annual totals
+        run: |
+          python tools/nsfc_e_scan_totals.py \
+            --start-conclusion-year "$START_CONCLUSION_YEAR" \
+            --end-conclusion-year "$END_CONCLUSION_YEAR" \
+            --delay 0.55 \
+            --retries 8 \
+            --output broad_e_annual_totals.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nsfc-e-broad-scan
+          path: broad_e_annual_totals.json
+          if-no-files-found: error
+          retention-days: 30
+
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    strategy:
+      fail-fast: false
+      max-parallel: 5
+      matrix:
+        code: [E01, E02, E03, E04, E05, E06, E07, E08, E09, E10, E11, E12, E13]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install runtime dependencies
+        run: python -m pip install --disable-pip-version-check requests pycryptodome
+      - name: Collect official completed-project partition
+        run: |
+          code_lower="$(echo '${{ matrix.code }}' | tr '[:upper:]' '[:lower:]')"
+          python tools/nsfc_e_collect.py \
+            --code "${{ matrix.code }}" \
+            --start-conclusion-year "$START_CONCLUSION_YEAR" \
+            --end-conclusion-year "$END_CONCLUSION_YEAR" \
+            --page-size 10 \
+            --delay 0.55 \
+            --retries 8 \
+            --output-dir "outputs/${code_lower}"
+      - name: Validate partition
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          code = "${{ matrix.code }}"
+          code_lower = code.lower()
+          root = Path("outputs") / code_lower
+          files = list(root.glob("*_coverage.json"))
+          if len(files) != 1:
+              raise SystemExit(f"{code}: expected one coverage file, found {files}")
+          coverage = json.loads(files[0].read_text(encoding="utf-8"))
+          if not coverage.get("complete"):
+              raise SystemExit(f"{code}: collection is not complete")
+          if coverage.get("query_code") != code:
+              raise SystemExit(f"{code}: query-code mismatch")
+          if int(coverage.get("code_contamination_rows") or 0):
+              raise SystemExit(f"{code}: code contamination")
+          oversized = {
+              year: stats["reported_total"]
+              for year, stats in coverage.get("annual", {}).items()
+              if int(stats.get("reported_total") or 0) > 1000
+          }
+          if oversized:
+              raise SystemExit(f"{code}: finer partition required: {oversized}")
+          mismatched = {
+              year: stats
+              for year, stats in coverage.get("annual", {}).items()
+              if int(stats.get("reported_total") or 0)
+              != int(stats.get("rows_seen") or 0)
+          }
+          if mismatched:
+              raise SystemExit(f"{code}: annual coverage mismatch: {mismatched}")
+          print({
+              "code": code,
+              "unique_approval_numbers": coverage["unique_approval_numbers"],
+              "raw_rows": coverage["raw_rows"],
+          })
+          PY
+      - name: Upload partition
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nsfc-e-partition-${{ matrix.code }}
+          path: outputs
+          if-no-files-found: error
+          retention-days: 30
+
+  merge:
+    needs: [broad-scan, collect]
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Download E01-E13 partitions
+        uses: actions/download-artifact@v4
+        with:
+          pattern: nsfc-e-partition-*
+          path: downloaded
+          merge-multiple: true
+      - name: Download independent broad-E scan
+        uses: actions/download-artifact@v4
+        with:
+          name: nsfc-e-broad-scan
+          path: broad
+      - name: Merge, reconcile, and build E number-learning base
+        run: |
+          python tools/nsfc_e_merge_partitioned.py \
+            --input-root downloaded \
+            --broad-scan broad/broad_e_annual_totals.json \
+            --output-dir outputs/nsfc-e-official-completed-base
+      - name: Package persistent dataset
+        run: |
+          tar -C outputs -czf nsfc-e-official-completed-base.tar.gz \
+            nsfc-e-official-completed-base
+          sha256sum nsfc-e-official-completed-base.tar.gz \
+            > nsfc-e-official-completed-base.tar.gz.sha256
+      - name: Upload final workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nsfc-e-official-completed-base
+          path: |
+            outputs/nsfc-e-official-completed-base
+            nsfc-e-official-completed-base.tar.gz
+            nsfc-e-official-completed-base.tar.gz.sha256
+          if-no-files-found: error
+          retention-days: 30
+      - name: Publish persistent GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if ! gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release create "$RELEASE_TAG" \
+              --target "$GITHUB_SHA" \
+              --title "NSFC E口官方公开已结题基础数据" \
+              --notes "E01-E13公开已结题项目基础数据。逐年分区合计与独立广义E口扫描核对一致。仅代表公开已结题项目子集，不代表全部获批或在研项目。"
+          fi
+          gh release upload "$RELEASE_TAG" \
+            nsfc-e-official-completed-base.tar.gz \
+            nsfc-e-official-completed-base.tar.gz.sha256 \
+            outputs/nsfc-e-official-completed-base/EXECUTION_SUMMARY.md \
+            outputs/nsfc-e-official-completed-base/nsfc_e_number_segment_rules_seed.csv \
+            outputs/nsfc-e-official-completed-base/nsfc_e_completed_coverage.json \
+            outputs/nsfc-e-official-completed-base/dataset_manifest.json \
+            --clobber
