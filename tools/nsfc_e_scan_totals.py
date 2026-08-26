@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""Independently scan broad-E annual totals from the public completed-project API."""
+"""Independently scan annual totals for an E application-code prefix."""
 from __future__ import annotations
 
 import argparse
 import base64
 import json
 import random
+import re
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -19,8 +20,8 @@ BASE_URL = "https://kd.nsfc.cn"
 ENDPOINT = BASE_URL + "/api/baseQuery/completionQueryResultsData"
 DES_KEY = b"IFROMC86"
 # The endpoint may temporarily return 403 when several independent partitions
-# are active.  A later sequential broad scan should back off rather than treat
-# that transient response as a permanent access denial.
+# are active. A later sequential scan should back off rather than treat that
+# transient response as a permanent access denial.
 RETRYABLE = {403, 408, 425, 429, 500, 502, 503, 504}
 requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 
@@ -51,9 +52,9 @@ def decode(text: str) -> dict[str, Any]:
     return parsed
 
 
-def payload(year: int) -> dict[str, Any]:
+def payload(code: str, year: int) -> dict[str, Any]:
     return {
-        "code": "E",
+        "code": code,
         "fuzzyKeyword": "",
         "complete": True,
         "isFuzzySearch": False,
@@ -79,20 +80,25 @@ def payload(year: int) -> dict[str, Any]:
     }
 
 
-def query(session: requests.Session, year: int, retries: int) -> int:
+def query(
+    session: requests.Session,
+    code: str,
+    year: int,
+    retries: int,
+) -> int:
     headers = {
         "Accept": "application/json, text/plain, */*",
         "Content-Type": "application/json",
         "Origin": BASE_URL,
         "Referer": BASE_URL + "/finalProjectInit",
         "Authorization": "Bearer false",
-        "User-Agent": "PolyFT/nsfc-e-broad-total-scan/1.1",
+        "User-Agent": "PolyFT/nsfc-e-total-scan/1.2",
     }
     for attempt in range(retries):
         try:
             response = session.post(
                 ENDPOINT,
-                json=payload(year),
+                json=payload(code, year),
                 headers=headers,
                 timeout=90,
                 verify=False,
@@ -116,12 +122,14 @@ def query(session: requests.Session, year: int, retries: int) -> int:
             if status is not None and status not in RETRYABLE:
                 raise
             if attempt + 1 >= retries:
-                raise RuntimeError(f"broad E scan failed for {year}: {exc}") from exc
+                raise RuntimeError(
+                    f"total scan failed for code={code}, year={year}: {exc}"
+                ) from exc
             delay = min(120.0, 3.0 * (2**attempt)) + random.uniform(0, 1.0)
             print(
                 json.dumps(
                     {
-                        "query_code": "E",
+                        "query_code": code,
                         "conclusion_year": year,
                         "retry": attempt + 1,
                         "status": status,
@@ -137,6 +145,7 @@ def query(session: requests.Session, year: int, retries: int) -> int:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
+    parser.add_argument("--code", default="E")
     parser.add_argument("--start-conclusion-year", type=int, default=1987)
     parser.add_argument("--end-conclusion-year", type=int, default=2024)
     parser.add_argument("--delay", type=float, default=1.0)
@@ -144,13 +153,21 @@ def main() -> None:
     parser.add_argument("--output", required=True)
     args = parser.parse_args()
 
+    code = args.code.strip().upper()
+    if code != "E" and not re.fullmatch(r"E\d{2,6}", code):
+        raise SystemExit("--code must be E or an E application-code prefix")
+
     session = requests.Session()
     annual: dict[str, int] = {}
     for year in range(args.start_conclusion_year, args.end_conclusion_year + 1):
-        annual[str(year)] = query(session, year, args.retries)
+        annual[str(year)] = query(session, code, year, args.retries)
         print(
             json.dumps(
-                {"query_code": "E", "conclusion_year": year, "total": annual[str(year)]},
+                {
+                    "query_code": code,
+                    "conclusion_year": year,
+                    "total": annual[str(year)],
+                },
                 ensure_ascii=False,
             ),
             flush=True,
@@ -163,7 +180,7 @@ def main() -> None:
         json.dumps(
             {
                 "as_of": utc_now(),
-                "query_code": "E",
+                "query_code": code,
                 "scope": "NSFC public completed-project endpoint annual totals",
                 "start_conclusion_year": args.start_conclusion_year,
                 "end_conclusion_year": args.end_conclusion_year,
