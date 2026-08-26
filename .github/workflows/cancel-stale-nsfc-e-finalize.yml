@@ -1,0 +1,22 @@
+name: Cancel stale NSFC E finalization run
+
+on:
+  push:
+    branches: [nsfc-e-data-runner]
+    paths:
+      - ".github/workflows/cancel-stale-nsfc-e-finalize.yml"
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  cancel:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cancel superseded finalization run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api --method POST \
+            "/repos/$GITHUB_REPOSITORY/actions/runs/32971521874/cancel" || true
