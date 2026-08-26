@@ -1,0 +1,210 @@
+name: Finalize NSFC E completed-project base and release
+
+on:
+  push:
+    branches: [nsfc-e-data-runner]
+    paths:
+      - ".github/workflows/nsfc-e-finalize-release.yml"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: nsfc-e-finalize-release
+  cancel-in-progress: false
+
+env:
+  MAIN_PARTITION_RUN_ID: "32966775117"
+  E05_REFINED_RUN_ID: "32968706711"
+  RELEASE_TAG: "nsfc-e-official-completed-2026-08-26"
+  START_CONCLUSION_YEAR: "1986"
+  END_CONCLUSION_YEAR: "2026"
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install runtime dependencies
+        run: python -m pip install --disable-pip-version-check requests pycryptodome
+      - name: Wait for source collection runs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          for run_id in "$MAIN_PARTITION_RUN_ID" "$E05_REFINED_RUN_ID"; do
+            echo "Waiting for source run ${run_id}"
+            completed=false
+            for attempt in $(seq 1 240); do
+              status="$(gh api "/repos/$GITHUB_REPOSITORY/actions/runs/${run_id}" --jq .status)"
+              conclusion="$(gh api "/repos/$GITHUB_REPOSITORY/actions/runs/${run_id}" --jq '.conclusion // ""')"
+              echo "run=${run_id} status=${status} conclusion=${conclusion} attempt=${attempt}"
+              if [ "$status" = "completed" ]; then
+                completed=true
+                break
+              fi
+              sleep 30
+            done
+            if [ "$completed" != "true" ]; then
+              echo "Timed out waiting for source run ${run_id}" >&2
+              exit 1
+            fi
+          done
+      - name: Download required E01-E13 artifacts except superseded E05 root
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p downloaded/main
+          for code in E01 E02 E03 E04 E06 E07 E08 E09 E10 E11 E12 E13; do
+            name="nsfc-e-partition-${code}"
+            mkdir -p "downloaded/main/${name}"
+            gh run download "$MAIN_PARTITION_RUN_ID" \
+              --name "$name" \
+              --dir "downloaded/main/${name}"
+          done
+      - name: Download refined E05 artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p downloaded/e05
+          names=(
+            nsfc-e-refined-E05-root-1986-2014
+            nsfc-e-refined-E0501-2015-2026
+            nsfc-e-refined-E0502-2015-2026
+            nsfc-e-refined-E0503-2015-2026
+            nsfc-e-refined-E0504-2015-2026
+            nsfc-e-refined-E0505-2015-2026
+            nsfc-e-refined-E0506-2015-2026
+            nsfc-e-refined-E0507-2015-2026
+            nsfc-e-refined-E0508-2015-2026
+            nsfc-e-refined-E0509-2015-2026
+            nsfc-e-refined-E0510-2015-2026
+            nsfc-e-refined-E0511-2015-2026
+            nsfc-e-refined-E0512-2015-2026
+          )
+          for name in "${names[@]}"; do
+            mkdir -p "downloaded/e05/${name}"
+            gh run download "$E05_REFINED_RUN_ID" \
+              --name "$name" \
+              --dir "downloaded/e05/${name}"
+          done
+          find downloaded -type f | sort
+      - name: Independently scan broad-E annual totals
+        run: |
+          python tools/nsfc_e_scan_totals.py \
+            --code E \
+            --start-conclusion-year "$START_CONCLUSION_YEAR" \
+            --end-conclusion-year "$END_CONCLUSION_YEAR" \
+            --delay 1.2 \
+            --retries 12 \
+            --output broad_e_annual_totals.json
+      - name: Merge partitions and enforce annual reconciliation
+        run: |
+          python tools/nsfc_e_merge_plan.py \
+            --input-root downloaded/main \
+            --input-root downloaded/e05 \
+            --partition-plan config/nsfc_e_partition_plan_1986_2026.json \
+            --broad-scan broad_e_annual_totals.json \
+            --output-dir outputs/nsfc-e-official-completed-base
+      - name: Learn the complete empirical approval-number rule system
+        run: |
+          python tools/nsfc_e_learn_number_rules.py \
+            --master-csv outputs/nsfc-e-official-completed-base/nsfc_e_completed_master.csv.gz \
+            --output-dir outputs/nsfc-e-official-completed-base
+          cp broad_e_annual_totals.json \
+            outputs/nsfc-e-official-completed-base/broad_e_annual_totals.json
+      - name: Package full dataset for local synchronization
+        run: |
+          set -euo pipefail
+          tar -C outputs -czf nsfc-e-official-completed-base.tar.gz \
+            nsfc-e-official-completed-base
+          sha256sum nsfc-e-official-completed-base.tar.gz \
+            > nsfc-e-official-completed-base.tar.gz.sha256
+          ls -lh nsfc-e-official-completed-base.tar.gz*
+      - name: Stage compact Git-tracked knowledge outputs
+        run: |
+          set -euo pipefail
+          src="outputs/nsfc-e-official-completed-base"
+          dst="data/nsfc-e"
+          rm -rf "$dst"
+          mkdir -p "$dst"
+          cp "$src/EXECUTION_SUMMARY.md" "$dst/"
+          cp "$src/NSFC_E_NUMBER_RULE_REPORT.md" "$dst/"
+          cp "$src/nsfc_e_completed_coverage.json" "$dst/"
+          cp "$src/dataset_manifest.json" "$dst/"
+          cp "$src/nsfc_e_number_rule_quality.json" "$dst/"
+          cp "$src/nsfc_e_number_rule_catalog.json" "$dst/"
+          cp "$src/nsfc_e_number_template_rules.csv" "$dst/"
+          cp "$src/nsfc_e_number_segments.csv" "$dst/"
+          cp "$src/nsfc_e_number_contiguous_runs.csv" "$dst/"
+          cp "$src/nsfc_e_number_pattern_transitions.csv" "$dst/"
+          cp "$src/nsfc_e_number_rule_ambiguities.csv" "$dst/"
+          cp "$src/nsfc_e_project_type_values.csv" "$dst/"
+          cp "$src/nsfc_e_counts_by_year_code_type.csv" "$dst/"
+          cp "$src/broad_e_annual_totals.json" "$dst/"
+          cat > "$dst/LOCAL_SYNC.md" <<'EOF'
+          # 本地同步
+
+          完整 CSV、SQLite、原始 JSONL 和规则输出保存在 GitHub Release：
+          `nsfc-e-official-completed-2026-08-26`。
+
+          在仓库根目录执行：
+
+          ```bash
+          python tools/sync_nsfc_e_local.py --dest data-local/nsfc-e
+          ```
+
+          脚本会下载发布包、核验 SHA-256，并原子更新 `data-local/nsfc-e/current`。
+          仓库中的 `data/nsfc-e/` 只保存便于 Git 同步和审查的规则、统计、覆盖度及报告。
+          EOF
+          printf '%s\n' "$RELEASE_TAG" > "$dst/LATEST_RELEASE.txt"
+      - name: Commit compact knowledge outputs for git pull synchronization
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/nsfc-e
+          if git diff --cached --quiet; then
+            echo "No compact knowledge-output changes"
+          else
+            git commit -m "data: publish NSFC E completed-base rules and audit outputs [skip ci]"
+            git push origin HEAD:nsfc-e-data-runner
+          fi
+      - name: Upload final workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nsfc-e-official-completed-base
+          path: |
+            outputs/nsfc-e-official-completed-base
+            nsfc-e-official-completed-base.tar.gz
+            nsfc-e-official-completed-base.tar.gz.sha256
+          if-no-files-found: error
+          retention-days: 30
+      - name: Publish persistent GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if ! gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release create "$RELEASE_TAG" \
+              --target nsfc-e-data-runner \
+              --title "NSFC E口官方公开已结题基础数据与批准号规律" \
+              --notes "E01-E13公开已结题项目基础数据与完整经验编号规则。分区逐年合计与独立广义E口扫描逐年核对一致。完整数据通过仓库内 tools/sync_nsfc_e_local.py 自动同步到本地，不接入网盘。数据仅代表公开已结题项目，不代表全部获批或在研项目。"
+          fi
+          gh release upload "$RELEASE_TAG" \
+            nsfc-e-official-completed-base.tar.gz \
+            nsfc-e-official-completed-base.tar.gz.sha256 \
+            outputs/nsfc-e-official-completed-base/EXECUTION_SUMMARY.md \
+            outputs/nsfc-e-official-completed-base/NSFC_E_NUMBER_RULE_REPORT.md \
+            outputs/nsfc-e-official-completed-base/nsfc_e_completed_coverage.json \
+            outputs/nsfc-e-official-completed-base/nsfc_e_number_rule_quality.json \
+            outputs/nsfc-e-official-completed-base/dataset_manifest.json \
+            --clobber
