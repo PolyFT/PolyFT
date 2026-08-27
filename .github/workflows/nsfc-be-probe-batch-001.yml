@@ -1,0 +1,125 @@
+name: NSFC B/E approval-number probe batch 001
+
+on:
+  push:
+    branches: [nsfc-e-data-runner]
+    paths:
+      - ".github/workflows/nsfc-be-probe-batch-001.yml"
+      - "tools/nsfc_be_probe_bibliographic.py"
+      - "tools/sync_nsfc_be_probe_local.py"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nsfc-be-probe-batch-001
+  cancel-in-progress: false
+
+env:
+  RELEASE_TAG: nsfc-be-probe-batch-001-2026-08-27
+  ARCHIVE_NAME: nsfc-be-probe-batch-001.tar.gz
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install runtime dependencies
+        run: python -m pip install --disable-pip-version-check requests
+      - name: Probe the first 200 selected approval numbers
+        env:
+          OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
+          CROSSREF_MAILTO: ${{ vars.CROSSREF_MAILTO }}
+        run: |
+          python tools/nsfc_be_probe_bibliographic.py \
+            --queue data/nsfc-be/BE_PROBE_QUEUE_v1.csv \
+            --selected-only \
+            --limit 200 \
+            --delay 0.12 \
+            --retries 7 \
+            --output-dir outputs/nsfc-be-probe-batch-001
+      - name: Package full evidence for local synchronization
+        run: |
+          set -euo pipefail
+          tar -C outputs -czf "$ARCHIVE_NAME" nsfc-be-probe-batch-001
+          sha256sum "$ARCHIVE_NAME" > "$ARCHIVE_NAME.sha256"
+          ls -lh "$ARCHIVE_NAME" "$ARCHIVE_NAME.sha256"
+      - name: Stage compact Git-tracked results
+        run: |
+          set -euo pipefail
+          src=outputs/nsfc-be-probe-batch-001
+          dst=data/nsfc-be-probes/batch-001
+          rm -rf "$dst"
+          mkdir -p "$dst"
+          for name in \
+            PROBE_BATCH_REPORT.md \
+            probe_quality.json \
+            probe_status.csv \
+            confirmed_project_candidates.csv \
+            web_followup_queue.csv \
+            batch_manifest.json; do
+            cp "$src/$name" "$dst/$name"
+          done
+          cat > "$dst/LOCAL_SYNC.md" <<'EOF'
+          # 本地同步
+
+          完整原始API响应和逐论文证据保存在Release：
+          `nsfc-be-probe-batch-001-2026-08-27`。
+
+          在仓库根目录执行：
+
+          ```bash
+          python tools/sync_nsfc_be_probe_local.py \
+            --dest data-local/nsfc-be-probes/batch-001
+          ```
+
+          脚本会核验SHA-256并原子更新本地目录。
+          EOF
+          printf '%s\n' "$RELEASE_TAG" > "$dst/LATEST_RELEASE.txt"
+      - name: Commit compact probe results
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/nsfc-be-probes/batch-001
+          if git diff --cached --quiet; then
+            echo "No compact probe-result changes"
+          else
+            git commit -m "data: publish NSFC B/E probe batch 001 [skip ci]"
+            git fetch origin nsfc-e-data-runner
+            git rebase origin/nsfc-e-data-runner
+            git push origin HEAD:nsfc-e-data-runner
+          fi
+      - name: Upload complete workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nsfc-be-probe-batch-001
+          path: |
+            outputs/nsfc-be-probe-batch-001
+            nsfc-be-probe-batch-001.tar.gz
+            nsfc-be-probe-batch-001.tar.gz.sha256
+          if-no-files-found: error
+          retention-days: 30
+      - name: Publish persistent GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if ! gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release create "$RELEASE_TAG" \
+              --target nsfc-e-data-runner \
+              --title "NSFC B/E批准号第一批文献证据探针" \
+              --notes "对B/E号段矩阵自动选中的首批200个候选批准号执行Crossref与OpenAlex Awards/Works精确探针。结果只形成文献/聚合器证据和后续Web核查队列；零结果不等于空号，候选负责人、单位和题名不直接写入项目主表。"
+          fi
+          gh release upload "$RELEASE_TAG" \
+            "$ARCHIVE_NAME" \
+            "$ARCHIVE_NAME.sha256" \
+            outputs/nsfc-be-probe-batch-001/PROBE_BATCH_REPORT.md \
+            outputs/nsfc-be-probe-batch-001/probe_quality.json \
+            outputs/nsfc-be-probe-batch-001/batch_manifest.json \
+            --clobber
