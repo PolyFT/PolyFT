@@ -1,0 +1,48 @@
+{
+  "dataset": "nsfc_be_probe_batch_001",
+  "generated_at": "2026-08-27T07:33:47+00:00",
+  "input_queue": "data/nsfc-be/BE_PROBE_QUEUE_v1.csv",
+  "selected_count": 200,
+  "sources": [
+    "crossref",
+    "openalex_awards",
+    "openalex_works"
+  ],
+  "files": [
+    {
+      "name": "probe_raw_responses.jsonl.gz",
+      "size_bytes": 1366331,
+      "sha256": "d681e4427cf641920cb0ea27648214786b45b62bef7b0bab82c43bf8201ea54f"
+    },
+    {
+      "name": "probe_status.csv",
+      "size_bytes": 129014,
+      "sha256": "1a851ba9800c60c6f426862d873fb183dd2e102abf28761ae9eb4a73a332a982"
+    },
+    {
+      "name": "bibliographic_evidence.csv.gz",
+      "size_bytes": 48407,
+      "sha256": "de596252cd67ad8914d56f1e2fe10db532bccb95d1f9c65cf1d521ad98c5f537"
+    },
+    {
+      "name": "confirmed_project_candidates.csv",
+      "size_bytes": 18096,
+      "sha256": "5079510dbc5d2660d52c0e61632edbc21d425608a3f951d1dc2a01c37762b95a"
+    },
+    {
+      "name": "web_followup_queue.csv",
+      "size_bytes": 66082,
+      "sha256": "ab2d010d0777347d4a993d07f5f919829033dceefd316c538ad8517d9040b076"
+    },
+    {
+      "name": "probe_quality.json",
+      "size_bytes": 1172,
+      "sha256": "f0b1a263c460198f7cfdf91371b10a36145813d98a652849a42ef4d68ab93f02"
+    },
+    {
+      "name": "PROBE_BATCH_REPORT.md",
+      "size_bytes": 1450,
+      "sha256": "3e847a14def49cfd773aaa1120e35cbb20df0ad8549685c1fdf31833e37ffd23"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "generated_at": "2026-08-27T07:33:47+00:00",
+  "input_queue": "data/nsfc-be/BE_PROBE_QUEUE_v1.csv",
+  "selected_count": 200,
+  "discipline_root_counts": {
+    "E": 179,
+    "B": 21
+  },
+  "input_priority_counts": {
+    "P1": 169,
+    "P2": 31
+  },
+  "existence_status_counts": {
+    "confirmed_bibliographic": 87,
+    "no_match_all_sources": 110,
+    "award_number_only": 3
+  },
+  "source_confirmation_counts": {
+    "crossref": 87
+  },
+  "confirmed_candidate_count": 87,
+  "evidence_row_count": 445,
+  "followup_queue_count": 200,
+  "http_status_counts": {
+    "crossref_strict:200": 200,
+    "crossref_strict:429": 78,
+    "crossref_award_only:200": 114,
+    "crossref_award_only:429": 39,
+    "openalex_awards:200": 2,
+    "openalex_works:200": 2
+  },
+  "request_count": 435,
+  "source_scope": [
+    "Crossref",
+    "OpenAlex Awards",
+    "OpenAlex Works"
+  ],
+  "data_boundary": "bibliographic and aggregator evidence only",
+  "negative_result_rule": "zero results do not prove an unused approval number",
+  "identity_rule": "lead investigator, institution, and title candidates are not written to the master table without official or institutional confirmation"
+}
