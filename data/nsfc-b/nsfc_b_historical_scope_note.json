@@ -1,0 +1,7 @@
+{
+  "scope": "B05_legacy_material_energy",
+  "approval_year_start": 2017,
+  "approval_year_end": 2020,
+  "raw_code_preserved": true,
+  "warning": "Do not infer modern B05 or B09 solely from the historical approval number."
+}

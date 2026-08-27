@@ -1,0 +1,123 @@
+{
+  "generated_at": "2026-08-27T05:59:30+00:00",
+  "scope": "NSFC public completed-project endpoint; primary application codes B01-B09",
+  "conclusion_year_start": 1986,
+  "conclusion_year_end": 2026,
+  "reconciliation_mode": "explicit_B01_B09_nonoverlapping_partition_plan",
+  "partition_summaries": [
+    {
+      "code": "B01",
+      "reported_total": 11208,
+      "unique_approval_numbers": 11208,
+      "coverage_file": "downloaded-b/nsfc-b-partition-B01/nsfc_b01_completed_1986-2026_coverage.json"
+    },
+    {
+      "code": "B02",
+      "reported_total": 5583,
+      "unique_approval_numbers": 5583,
+      "coverage_file": "downloaded-b/nsfc-b-partition-B02/nsfc_b02_completed_1986-2026_coverage.json"
+    },
+    {
+      "code": "B03",
+      "reported_total": 5960,
+      "unique_approval_numbers": 5960,
+      "coverage_file": "downloaded-b/nsfc-b-partition-B03/nsfc_b03_completed_1986-2026_coverage.json"
+    },
+    {
+      "code": "B04",
+      "reported_total": 6076,
+      "unique_approval_numbers": 6076,
+      "coverage_file": "downloaded-b/nsfc-b-partition-B04/nsfc_b04_completed_1986-2026_coverage.json"
+    },
+    {
+      "code": "B05",
+      "reported_total": 4713,
+      "unique_approval_numbers": 4713,
+      "coverage_file": "downloaded-b/nsfc-b-partition-B05/nsfc_b05_completed_1986-2026_coverage.json"
+    },
+    {
+      "code": "B06",
+      "reported_total": 6190,
+      "unique_approval_numbers": 6190,
+      "coverage_file": "downloaded-b/nsfc-b-partition-B06/nsfc_b06_completed_1986-2026_coverage.json"
+    },
+    {
+      "code": "B07",
+      "reported_total": 4302,
+      "unique_approval_numbers": 4302,
+      "coverage_file": "downloaded-b/nsfc-b-partition-B07/nsfc_b07_completed_1986-2026_coverage.json"
+    },
+    {
+      "code": "B08",
+      "reported_total": 10023,
+      "unique_approval_numbers": 10023,
+      "coverage_file": "downloaded-b/nsfc-b-partition-B08/nsfc_b08_completed_1986-2026_coverage.json"
+    },
+    {
+      "code": "B09",
+      "reported_total": 1516,
+      "unique_approval_numbers": 1516,
+      "coverage_file": "downloaded-b/nsfc-b-partition-B09/nsfc_b09_completed_1986-2026_coverage.json"
+    }
+  ],
+  "annual_partition_totals": {
+    "1986": 0,
+    "1987": 3,
+    "1988": 73,
+    "1989": 428,
+    "1990": 444,
+    "1991": 321,
+    "1992": 345,
+    "1993": 389,
+    "1994": 392,
+    "1995": 460,
+    "1996": 443,
+    "1997": 381,
+    "1998": 368,
+    "1999": 387,
+    "2000": 400,
+    "2001": 433,
+    "2002": 486,
+    "2003": 536,
+    "2004": 531,
+    "2005": 674,
+    "2006": 766,
+    "2007": 952,
+    "2008": 1084,
+    "2009": 1175,
+    "2010": 1443,
+    "2011": 1734,
+    "2012": 1943,
+    "2013": 2446,
+    "2014": 1478,
+    "2015": 3068,
+    "2016": 3266,
+    "2017": 3420,
+    "2018": 3304,
+    "2019": 3427,
+    "2020": 3447,
+    "2021": 3632,
+    "2022": 3734,
+    "2023": 3663,
+    "2024": 4095,
+    "2025": 0,
+    "2026": 0
+  },
+  "reported_total_sum": 55571,
+  "unique_approval_numbers": 55571,
+  "number_learning_observations": 55571,
+  "duplicate_conflicts": 0,
+  "project_type_counts": {
+    "special": 1130,
+    "youth_c": 20201,
+    "key": 1130,
+    "regional": 2869,
+    "general": 28600,
+    "joint_fund": 509,
+    "major_research_plan": 1132
+  },
+  "complete": true,
+  "completeness_status": "complete_within_explicit_public_completed_project_partition_plan",
+  "data_boundary": "Does not include active or otherwise not-yet-completed awards.",
+  "historical_code_note": "B05 records approved in 2017-2020 are learned under B05_legacy_material_energy without altering the raw application code."
+}

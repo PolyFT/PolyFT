@@ -1,0 +1,125 @@
+{
+  "generated_at": "2026-08-27T05:59:37+00:00",
+  "scope": "NSFC B/E approval-number intelligence",
+  "principles": [
+    "Number patterns are navigation and completeness probes, not project facts.",
+    "Empty cells do not prove that no award existed.",
+    "Historical transitions and shared number spaces must be reviewed before probing.",
+    "Crossref zero results are negative probes only; HTTP status must be retained.",
+    "PI identity requires official or institutional confirmation and is outside this matrix."
+  ],
+  "matrix_definition": {
+    "dimensions": [
+      "discipline_root",
+      "discipline_scope",
+      "approval_year",
+      "project_type"
+    ],
+    "statuses": [
+      "sufficient",
+      "partial",
+      "empty",
+      "historical_transition",
+      "shared_number_space"
+    ]
+  },
+  "quality": {
+    "generated_at": "2026-08-27T05:59:37+00:00",
+    "matrix": {
+      "status_counts": {
+        "shared_number_space": 1042,
+        "empty": 11773,
+        "historical_transition": 1134,
+        "sufficient": 591,
+        "partial": 548
+      },
+      "matrix_rows": 15088,
+      "start_year": 1986,
+      "end_year": 2026
+    },
+    "coverage_status_counts": {
+      "shared_number_space": 1042,
+      "empty": 11773,
+      "historical_transition": 1134,
+      "sufficient": 591,
+      "partial": 548
+    },
+    "high_value_anchor_priority_counts": {
+      "P0": 7998,
+      "P1": 446,
+      "P2": 43
+    },
+    "probe_queue_count": 1019,
+    "probe_priority_counts": {
+      "P1": 169,
+      "P2": 49,
+      "P3": 801
+    },
+    "first_batch_selected": 200,
+    "B_rule_quality": {
+      "generated_at": "2026-08-27T05:59:34+00:00",
+      "records": 55571,
+      "parsed_format_rate": 0.9990462651382915,
+      "format_counts": {
+        "numeric8": 55064,
+        "alpha_numeric": 454,
+        "other": 53
+      },
+      "encoded_year_match_counts": {
+        "true": 55518,
+        "unknown": 53
+      },
+      "encoded_year_match_rate_when_available": 1.0,
+      "project_type_counts": {
+        "special": 1130,
+        "youth_c": 20201,
+        "key": 1130,
+        "regional": 2869,
+        "general": 28600,
+        "joint_fund": 509,
+        "major_research_plan": 1132
+      },
+      "unmapped_project_type_records": 0,
+      "segment_count": 2871,
+      "template_rule_count": 816,
+      "transition_count": 703,
+      "ambiguity_count": 185,
+      "dense_gap_probe_count": 365,
+      "data_boundary": "official public completed-project subset only",
+      "discipline_root": "B",
+      "historical_scope_rule": "Approval years 2017-2020 with application_code_1 starting B05 are learned as B05_legacy_material_energy; raw application codes are not overwritten."
+    },
+    "E_rule_quality": {
+      "generated_at": "2026-08-26T14:12:19+00:00",
+      "records": 94761,
+      "parsed_format_rate": 0.9983432002617111,
+      "format_counts": {
+        "numeric8": 93544,
+        "alpha_numeric": 1060,
+        "other": 157
+      },
+      "encoded_year_match_counts": {
+        "true": 94604,
+        "unknown": 157
+      },
+      "encoded_year_match_rate_when_available": 1.0,
+      "project_type_counts": {
+        "youth_c": 39029,
+        "special": 1564,
+        "key": 1564,
+        "regional": 3967,
+        "general": 46085,
+        "joint_fund": 1572,
+        "major_research_plan": 980
+      },
+      "unmapped_project_type_records": 0,
+      "segment_count": 2498,
+      "template_rule_count": 656,
+      "transition_count": 431,
+      "ambiguity_count": 267,
+      "dense_gap_probe_count": 655,
+      "data_boundary": "official public completed-project subset only"
+    },
+    "data_boundary": "B/E official completed-project rule-learning coverage only"
+  }
+}

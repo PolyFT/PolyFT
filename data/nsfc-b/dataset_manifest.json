@@ -1,0 +1,47 @@
+{
+  "dataset": "nsfc_b_public_completed_project_base",
+  "generated_at": "2026-08-27T05:59:30+00:00",
+  "scope": "NSFC public completed-project endpoint; primary application codes B01-B09",
+  "files": [
+    {
+      "name": "nsfc_b_completed_master.csv.gz",
+      "size_bytes": 5254661,
+      "sha256": "348d6add1f1060db86f98854a579071908ac09710610f6092015aaec532b4fac"
+    },
+    {
+      "name": "nsfc_b_completed_master.sqlite",
+      "size_bytes": 21520384,
+      "sha256": "76f98d26ce7542415e265cd9f490541d282c48d098b1af432292047d7a16eb16"
+    },
+    {
+      "name": "nsfc_b_completed_raw.jsonl.gz",
+      "size_bytes": 7748588,
+      "sha256": "0ef49349ec3c739b5784b20457a7f40d8e4fb5ec0c2a688558b1a47d246fe1f5"
+    },
+    {
+      "name": "nsfc_b_number_learning_observations.csv.gz",
+      "size_bytes": 213131,
+      "sha256": "09db6ed96577b78cd80b48fa95236114733eedef70609ddcb977b9306618cfbe"
+    },
+    {
+      "name": "nsfc_b_counts_by_year_code_type.csv",
+      "size_bytes": 31673,
+      "sha256": "caa11a0d0e9d98ca719abb95e8ffeb89436d232166eec38cc31497e8161dda9c"
+    },
+    {
+      "name": "nsfc_b_project_type_values.csv",
+      "size_bytes": 294,
+      "sha256": "904adc84043b301c987e8d9c6cd46ed79ca50fe3b5c18e9b2f5e9fb3c0029439"
+    },
+    {
+      "name": "nsfc_b_completed_coverage.json",
+      "size_bytes": 3572,
+      "sha256": "5f4110f0121ad6a7ecd7ef601b75bd024bd762fdd20804fcbaa1c7c4acc1a56e"
+    },
+    {
+      "name": "nsfc_b_merge_conflicts.jsonl",
+      "size_bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}
