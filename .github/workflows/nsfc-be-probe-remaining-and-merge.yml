@@ -1,0 +1,203 @@
+name: NSFC B/E remaining probes and cumulative merge
+
+on:
+  push:
+    branches: [nsfc-e-data-runner]
+    paths:
+      - ".github/workflows/nsfc-be-probe-remaining-and-merge.yml"
+      - "tools/nsfc_be_prepare_probe_batch.py"
+      - "tools/nsfc_be_merge_probe_batches.py"
+      - "tools/sync_nsfc_be_probe_all_local.py"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: nsfc-be-probe-remaining-and-merge
+  cancel-in-progress: false
+
+env:
+  FIRST_BATCH_TAG: nsfc-be-probe-batch-001-2026-08-27
+  RELEASE_TAG: nsfc-be-probe-all-1019-2026-08-27
+  ARCHIVE_NAME: nsfc-be-probe-all-1019.tar.gz
+
+jobs:
+  probe-remaining:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        include:
+          - batch_id: batch-002
+            offset: 0
+            limit: 200
+          - batch_id: batch-003
+            offset: 200
+            limit: 200
+          - batch_id: batch-004
+            offset: 400
+            limit: 200
+          - batch_id: batch-005
+            offset: 600
+            limit: 219
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install runtime dependencies
+        run: python -m pip install --disable-pip-version-check requests
+      - name: Select deterministic remaining-number slice
+        run: |
+          mkdir -p prepared/${{ matrix.batch_id }}
+          python tools/nsfc_be_prepare_probe_batch.py \
+            --queue data/nsfc-be/BE_PROBE_QUEUE_v1.csv \
+            --mode remaining \
+            --offset ${{ matrix.offset }} \
+            --limit ${{ matrix.limit }} \
+            --batch-id ${{ matrix.batch_id }} \
+            --output prepared/${{ matrix.batch_id }}/queue.csv \
+            --metadata-output prepared/${{ matrix.batch_id }}/selection.json
+      - name: Run Crossref and OpenAlex evidence probe
+        env:
+          OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
+          CROSSREF_MAILTO: ${{ vars.CROSSREF_MAILTO }}
+        run: |
+          python tools/nsfc_be_probe_bibliographic.py \
+            --queue prepared/${{ matrix.batch_id }}/queue.csv \
+            --limit 0 \
+            --delay 0.18 \
+            --retries 8 \
+            --output-dir outputs/nsfc-be-probe-${{ matrix.batch_id }}
+          cp prepared/${{ matrix.batch_id }}/selection.json \
+            outputs/nsfc-be-probe-${{ matrix.batch_id }}/batch_selection.json
+      - name: Upload complete batch artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nsfc-be-probe-${{ matrix.batch_id }}
+          path: outputs/nsfc-be-probe-${{ matrix.batch_id }}
+          if-no-files-found: error
+          retention-days: 30
+
+  finalize:
+    needs: probe-remaining
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Download remaining-batch artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: nsfc-be-probe-batch-*
+          path: downloaded-remaining
+          merge-multiple: false
+      - name: Download and verify first-batch release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p external-first extracted-first
+          gh release download "$FIRST_BATCH_TAG" \
+            --pattern nsfc-be-probe-batch-001.tar.gz \
+            --pattern nsfc-be-probe-batch-001.tar.gz.sha256 \
+            --dir external-first
+          (cd external-first && sha256sum -c nsfc-be-probe-batch-001.tar.gz.sha256)
+          tar -C extracted-first -xzf external-first/nsfc-be-probe-batch-001.tar.gz
+          find extracted-first downloaded-remaining -name probe_status.csv -print | sort
+      - name: Merge all 1,019 candidate probes
+        run: |
+          python tools/nsfc_be_merge_probe_batches.py \
+            --input-root extracted-first \
+            --input-root downloaded-remaining \
+            --expected-count 1019 \
+            --official-upgrade-limit 1019 \
+            --web-review-limit 500 \
+            --output-dir outputs/nsfc-be-probe-all-1019
+      - name: Package cumulative evidence for local synchronization
+        run: |
+          set -euo pipefail
+          tar -C outputs -czf "$ARCHIVE_NAME" nsfc-be-probe-all-1019
+          sha256sum "$ARCHIVE_NAME" > "$ARCHIVE_NAME.sha256"
+          ls -lh "$ARCHIVE_NAME" "$ARCHIVE_NAME.sha256"
+      - name: Stage compact cumulative outputs
+        run: |
+          set -euo pipefail
+          src=outputs/nsfc-be-probe-all-1019
+          dst=data/nsfc-be-probes/all-1019
+          rm -rf "$dst"
+          mkdir -p "$dst"
+          for name in \
+            ALL_PROBE_REPORT.md \
+            ALL_PROBE_QUALITY.json \
+            ALL_PROBE_STATUS.csv \
+            ALL_CONFIRMED_PROJECT_CANDIDATES.csv \
+            OFFICIAL_UPGRADE_QUEUE_v1.csv \
+            EXACT_WEB_REVIEW_QUEUE_v1.csv \
+            ALL_PROBE_MANIFEST.json; do
+            cp "$src/$name" "$dst/$name"
+          done
+          cat > "$dst/LOCAL_SYNC.md" <<'EOF'
+          # 本地同步
+
+          完整1,019个候选的原始API响应、逐论文证据和累计状态保存在Release：
+          `nsfc-be-probe-all-1019-2026-08-27`。
+
+          在仓库根目录执行：
+
+          ```bash
+          python tools/sync_nsfc_be_probe_all_local.py \
+            --dest data-local/nsfc-be-probes/all-1019
+          ```
+
+          脚本会核验SHA-256并原子更新本地目录。
+          EOF
+          printf '%s\n' "$RELEASE_TAG" > "$dst/LATEST_RELEASE.txt"
+      - name: Commit compact cumulative outputs
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/nsfc-be-probes/all-1019
+          if git diff --cached --quiet; then
+            echo "No compact cumulative-output changes"
+          else
+            git commit -m "data: publish cumulative NSFC B/E probe results [skip ci]"
+            git fetch origin nsfc-e-data-runner
+            git rebase origin/nsfc-e-data-runner
+            git push origin HEAD:nsfc-e-data-runner
+          fi
+      - name: Upload complete cumulative artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nsfc-be-probe-all-1019
+          path: |
+            outputs/nsfc-be-probe-all-1019
+            nsfc-be-probe-all-1019.tar.gz
+            nsfc-be-probe-all-1019.tar.gz.sha256
+          if-no-files-found: error
+          retention-days: 30
+      - name: Publish persistent cumulative Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if ! gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release create "$RELEASE_TAG" \
+              --target nsfc-e-data-runner \
+              --title "NSFC B/E 1,019个候选批准号累计证据探针" \
+              --notes "对B/E号段矩阵的1,019个候选批准号完成Crossref与OpenAlex Awards/Works探针，生成累计状态、逐论文证据、官方/机构升级队列和精确Web复核队列。零结果不等于空号；候选负责人、单位和题名不得未经高等级来源确认写入项目主表。"
+          fi
+          gh release upload "$RELEASE_TAG" \
+            "$ARCHIVE_NAME" \
+            "$ARCHIVE_NAME.sha256" \
+            outputs/nsfc-be-probe-all-1019/ALL_PROBE_REPORT.md \
+            outputs/nsfc-be-probe-all-1019/ALL_PROBE_QUALITY.json \
+            outputs/nsfc-be-probe-all-1019/ALL_PROBE_MANIFEST.json \
+            --clobber
