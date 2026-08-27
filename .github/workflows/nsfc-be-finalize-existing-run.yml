@@ -1,0 +1,210 @@
+name: Finalize NSFC B rules and B/E matrix from collected partitions
+
+on:
+  push:
+    branches: [nsfc-e-data-runner]
+    paths:
+      - ".github/workflows/nsfc-be-finalize-existing-run.yml"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: nsfc-be-finalize-existing-run
+  cancel-in-progress: true
+
+env:
+  SOURCE_RUN_ID: "33027597006"
+  B_RELEASE_TAG: nsfc-b-official-completed-rules-2026-08-26
+  BE_RELEASE_TAG: nsfc-be-number-matrix-2026-08-26
+  E_RELEASE_TAG: nsfc-e-official-completed-2026-08-26
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Download the successful B01-B09 partitions without flattening
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p downloaded-b
+          for code in B01 B02 B03 B04 B05 B06 B07 B08 B09; do
+            name="nsfc-b-partition-${code}"
+            mkdir -p "downloaded-b/${name}"
+            gh run download "$SOURCE_RUN_ID" \
+              --name "$name" \
+              --dir "downloaded-b/${name}"
+          done
+          find downloaded-b -type f | sort
+
+      - name: Merge and validate B completed-project base
+        run: |
+          python tools/nsfc_b_merge.py \
+            --input-root downloaded-b \
+            --output-dir outputs/nsfc-b-official-completed-rules \
+            --start-conclusion-year 1986 \
+            --end-conclusion-year 2026
+
+      - name: Learn B approval-number rules at E-equivalent depth
+        run: |
+          python tools/nsfc_b_learn_number_rules.py \
+            --master-csv outputs/nsfc-b-official-completed-rules/nsfc_b_completed_master.csv.gz \
+            --output-dir outputs/nsfc-b-official-completed-rules
+
+      - name: Download and verify the released E rule base
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p external-e
+          gh release download "$E_RELEASE_TAG" \
+            --pattern nsfc-e-official-completed-base.tar.gz \
+            --pattern nsfc-e-official-completed-base.tar.gz.sha256 \
+            --dir external-e
+          (cd external-e && sha256sum -c nsfc-e-official-completed-base.tar.gz.sha256)
+          tar -C external-e -xzf external-e/nsfc-e-official-completed-base.tar.gz
+
+      - name: Build unified B/E coverage matrix and probe queue
+        run: |
+          set -euo pipefail
+          E_DIR="$(find external-e -type d -name nsfc-e-official-completed-base | head -1)"
+          test -n "$E_DIR"
+          python tools/nsfc_be_build_matrix.py \
+            --b-dir outputs/nsfc-b-official-completed-rules \
+            --e-dir "$E_DIR" \
+            --output-dir outputs/nsfc-be-number-matrix \
+            --start-year 1986 \
+            --end-year 2026 \
+            --recent-year 2022
+
+      - name: Package B base and B/E matrix for local synchronization
+        run: |
+          set -euo pipefail
+          tar -C outputs -czf nsfc-b-official-completed-rules.tar.gz \
+            nsfc-b-official-completed-rules
+          tar -C outputs -czf nsfc-be-number-matrix.tar.gz \
+            nsfc-be-number-matrix
+          sha256sum nsfc-b-official-completed-rules.tar.gz \
+            > nsfc-b-official-completed-rules.tar.gz.sha256
+          sha256sum nsfc-be-number-matrix.tar.gz \
+            > nsfc-be-number-matrix.tar.gz.sha256
+          ls -lh *.tar.gz*
+
+      - name: Stage compact Git-tracked outputs
+        run: |
+          set -euo pipefail
+          bsrc=outputs/nsfc-b-official-completed-rules
+          besrc=outputs/nsfc-be-number-matrix
+          rm -rf data/nsfc-b data/nsfc-be
+          mkdir -p data/nsfc-b data/nsfc-be
+          for name in \
+            EXECUTION_SUMMARY.md \
+            NSFC_B_NUMBER_RULE_REPORT.md \
+            dataset_manifest.json \
+            nsfc_b_completed_coverage.json \
+            nsfc_b_counts_by_year_code_type.csv \
+            nsfc_b_project_type_values.csv \
+            nsfc_b_number_template_rules.csv \
+            nsfc_b_number_segments.csv \
+            nsfc_b_number_contiguous_runs.csv \
+            nsfc_b_number_pattern_transitions.csv \
+            nsfc_b_number_rule_ambiguities.csv \
+            nsfc_b_number_gap_probe.csv \
+            nsfc_b_number_rule_catalog.json \
+            nsfc_b_number_rule_quality.json \
+            nsfc_b_historical_scope_note.json; do
+            test -f "$bsrc/$name" && cp "$bsrc/$name" data/nsfc-b/
+          done
+          cp "$besrc"/* data/nsfc-be/
+          cat > data/nsfc-b/LOCAL_SYNC.md <<'EOF'
+          # 本地同步
+
+          B口完整CSV、SQLite、原始JSONL和规律输出保存在Release：
+          `nsfc-b-official-completed-rules-2026-08-26`。
+          EOF
+          cat > data/nsfc-be/LOCAL_SYNC.md <<'EOF'
+          # 本地同步
+
+          在仓库根目录执行：
+
+          ```bash
+          python tools/sync_nsfc_be_local.py --dest data-local/nsfc-be
+          ```
+
+          脚本会下载B口基础数据与B/E矩阵两个Release，核验SHA-256并原子更新本地目录。
+          EOF
+          printf '%s\n' "$B_RELEASE_TAG" > data/nsfc-b/LATEST_RELEASE.txt
+          printf '%s\n' "$BE_RELEASE_TAG" > data/nsfc-be/LATEST_RELEASE.txt
+
+      - name: Commit compact outputs for git-pull synchronization
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/nsfc-b data/nsfc-be
+          if git diff --cached --quiet; then
+            echo "No compact-output changes"
+          else
+            git commit -m "data: publish NSFC B rules and B/E coverage matrix [skip ci]"
+            git fetch origin nsfc-e-data-runner
+            git rebase origin/nsfc-e-data-runner
+            git push origin HEAD:nsfc-e-data-runner
+          fi
+
+      - name: Upload final workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nsfc-b-and-be-number-matrix
+          path: |
+            outputs/nsfc-b-official-completed-rules
+            outputs/nsfc-be-number-matrix
+            nsfc-b-official-completed-rules.tar.gz
+            nsfc-b-official-completed-rules.tar.gz.sha256
+            nsfc-be-number-matrix.tar.gz
+            nsfc-be-number-matrix.tar.gz.sha256
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publish persistent B and B/E releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if ! gh release view "$B_RELEASE_TAG" >/dev/null 2>&1; then
+            gh release create "$B_RELEASE_TAG" \
+              --target nsfc-e-data-runner \
+              --title "NSFC B口官方公开已结题基础数据与批准号规律" \
+              --notes "B01-B09公开已结题基础数据与E同规格的经验批准号规则。2017-2020旧B05在规律层单独版本化。该数据不是全部获批或在研项目。"
+          fi
+          gh release upload "$B_RELEASE_TAG" \
+            nsfc-b-official-completed-rules.tar.gz \
+            nsfc-b-official-completed-rules.tar.gz.sha256 \
+            outputs/nsfc-b-official-completed-rules/EXECUTION_SUMMARY.md \
+            outputs/nsfc-b-official-completed-rules/NSFC_B_NUMBER_RULE_REPORT.md \
+            outputs/nsfc-b-official-completed-rules/nsfc_b_number_rule_quality.json \
+            outputs/nsfc-b-official-completed-rules/dataset_manifest.json \
+            --clobber
+
+          if ! gh release view "$BE_RELEASE_TAG" >/dev/null 2>&1; then
+            gh release create "$BE_RELEASE_TAG" \
+              --target nsfc-e-data-runner \
+              --title "NSFC B/E批准号完成矩阵与首批探针队列" \
+              --notes "统一的年度×项目类型×申请代码规律覆盖矩阵、高价值项目锚点缺失矩阵和经上下文风险降级的批准号探针队列。矩阵衡量规则学习覆盖度，不是获批全集完整度。"
+          fi
+          gh release upload "$BE_RELEASE_TAG" \
+            nsfc-be-number-matrix.tar.gz \
+            nsfc-be-number-matrix.tar.gz.sha256 \
+            outputs/nsfc-be-number-matrix/BE_NUMBER_MATRIX_REPORT.md \
+            outputs/nsfc-be-number-matrix/BE_NUMBER_MATRIX_QUALITY.json \
+            outputs/nsfc-be-number-matrix/BE_NUMBER_RULE_CATALOG.json \
+            --clobber
