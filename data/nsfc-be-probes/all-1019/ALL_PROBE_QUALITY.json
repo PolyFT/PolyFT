@@ -1,0 +1,105 @@
+{
+  "generated_at": "2026-08-27T07:59:01+00:00",
+  "batch_count": 5,
+  "candidate_count": 1019,
+  "expected_count": 1019,
+  "discipline_root_counts": {
+    "B": 365,
+    "E": 654
+  },
+  "input_priority_counts": {
+    "P3": 801,
+    "P2": 49,
+    "P1": 169
+  },
+  "existence_status_counts": {
+    "award_number_only": 22,
+    "no_match_all_sources": 580,
+    "confirmed_bibliographic": 417
+  },
+  "existence_status_by_root": {
+    "B": {
+      "award_number_only": 13,
+      "no_match_all_sources": 130,
+      "confirmed_bibliographic": 222
+    },
+    "E": {
+      "no_match_all_sources": 450,
+      "award_number_only": 9,
+      "confirmed_bibliographic": 195
+    }
+  },
+  "confirmed_candidate_count": 417,
+  "confirmation_rate": 0.40922473012757604,
+  "source_confirmation_counts": {
+    "crossref": 417
+  },
+  "evidence_row_count": 5070,
+  "official_upgrade_queue_count": 417,
+  "exact_web_review_queue_count": 500,
+  "batch_summaries": [
+    {
+      "directory": "/home/runner/work/PolyFT/PolyFT/downloaded-remaining/nsfc-be-probe-batch-002",
+      "selected_count": 200,
+      "confirmed_candidate_count": 138,
+      "evidence_row_count": 1949,
+      "existence_status_counts": {
+        "no_match_all_sources": 60,
+        "confirmed_bibliographic": 138,
+        "award_number_only": 2
+      },
+      "request_count": 364
+    },
+    {
+      "directory": "/home/runner/work/PolyFT/PolyFT/downloaded-remaining/nsfc-be-probe-batch-003",
+      "selected_count": 200,
+      "confirmed_candidate_count": 79,
+      "evidence_row_count": 1061,
+      "existence_status_counts": {
+        "confirmed_bibliographic": 79,
+        "no_match_all_sources": 115,
+        "award_number_only": 6
+      },
+      "request_count": 446
+    },
+    {
+      "directory": "/home/runner/work/PolyFT/PolyFT/downloaded-remaining/nsfc-be-probe-batch-004",
+      "selected_count": 200,
+      "confirmed_candidate_count": 65,
+      "evidence_row_count": 1087,
+      "existence_status_counts": {
+        "no_match_all_sources": 129,
+        "confirmed_bibliographic": 65,
+        "award_number_only": 6
+      },
+      "request_count": 468
+    },
+    {
+      "directory": "/home/runner/work/PolyFT/PolyFT/downloaded-remaining/nsfc-be-probe-batch-005",
+      "selected_count": 219,
+      "confirmed_candidate_count": 48,
+      "evidence_row_count": 528,
+      "existence_status_counts": {
+        "no_match_all_sources": 166,
+        "confirmed_bibliographic": 48,
+        "award_number_only": 5
+      },
+      "request_count": 554
+    },
+    {
+      "directory": "/home/runner/work/PolyFT/PolyFT/extracted-first/nsfc-be-probe-batch-001",
+      "selected_count": 200,
+      "confirmed_candidate_count": 87,
+      "evidence_row_count": 445,
+      "existence_status_counts": {
+        "confirmed_bibliographic": 87,
+        "no_match_all_sources": 110,
+        "award_number_only": 3
+      },
+      "request_count": 435
+    }
+  ],
+  "data_boundary": "bibliographic and aggregator evidence only",
+  "negative_result_rule": "successful zero-result queries do not prove an unused approval number",
+  "identity_rule": "candidate title, investigator, and institution fields require official or institutional confirmation before master-table use"
+}

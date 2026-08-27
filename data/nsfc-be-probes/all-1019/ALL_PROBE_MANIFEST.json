@@ -1,0 +1,59 @@
+{
+  "dataset": "nsfc_be_probe_all_candidates",
+  "generated_at": "2026-08-27T07:59:01+00:00",
+  "candidate_count": 1019,
+  "batch_directories": [
+    "/home/runner/work/PolyFT/PolyFT/downloaded-remaining/nsfc-be-probe-batch-002",
+    "/home/runner/work/PolyFT/PolyFT/downloaded-remaining/nsfc-be-probe-batch-003",
+    "/home/runner/work/PolyFT/PolyFT/downloaded-remaining/nsfc-be-probe-batch-004",
+    "/home/runner/work/PolyFT/PolyFT/downloaded-remaining/nsfc-be-probe-batch-005",
+    "/home/runner/work/PolyFT/PolyFT/extracted-first/nsfc-be-probe-batch-001"
+  ],
+  "files": [
+    {
+      "name": "all_probe_raw_responses.jsonl.gz",
+      "size_bytes": 15923055,
+      "sha256": "a1cde86e1af637ac7ea537cdde29145821ae898b019e94a2976d1d614e216022"
+    },
+    {
+      "name": "ALL_PROBE_STATUS.csv",
+      "size_bytes": 745358,
+      "sha256": "7aeb1f9a9bb321b6e0c4f4f1fcbe84b548cf22abf05eb8ad832f8082f84150e5"
+    },
+    {
+      "name": "ALL_BIBLIOGRAPHIC_EVIDENCE.csv.gz",
+      "size_bytes": 496956,
+      "sha256": "b7138a5a819c9982cae024d4fe633c66ea2621e9ad38a7ef006ebba794786f79"
+    },
+    {
+      "name": "ALL_CONFIRMED_PROJECT_CANDIDATES.csv",
+      "size_bytes": 85558,
+      "sha256": "8acc3540173a11da081eb4d609ff34656ea2db5acbc879ac0d64aba82dba3d30"
+    },
+    {
+      "name": "ALL_WEB_FOLLOWUP_QUEUE.csv",
+      "size_bytes": 334976,
+      "sha256": "e7148647eec9934b7a9fb356839051ca5c0641114f4bac92f3f16e772e2aebd9"
+    },
+    {
+      "name": "OFFICIAL_UPGRADE_QUEUE_v1.csv",
+      "size_bytes": 151909,
+      "sha256": "a233b7e6ebf602c871fa5cefc6131bb4725678d4076acfff7566c1fa1bc503ea"
+    },
+    {
+      "name": "EXACT_WEB_REVIEW_QUEUE_v1.csv",
+      "size_bytes": 182937,
+      "sha256": "d84a4ebf144d9cbe2e08d44f0d940f46f305b41a33feb786dc231c8018ef845e"
+    },
+    {
+      "name": "ALL_PROBE_QUALITY.json",
+      "size_bytes": 3210,
+      "sha256": "38a9d578c6a17a92e9e97f0889a72c5f3a26c992baa61839ec5657b084e509db"
+    },
+    {
+      "name": "ALL_PROBE_REPORT.md",
+      "size_bytes": 997,
+      "sha256": "7e943c0afb32702eaf3c87a8bea056ac72c6ad4083770407dbe5ddd9582a7ec2"
+    }
+  ]
+}
